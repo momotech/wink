@@ -1,0 +1,12 @@
+/local.properties
+.gradle
+.project
+.settings
+/.idea
+/*.iml
+*/*.iml
+.DS_Store
+/build
+*/build
+/capturesdo.sh
+wink-publish

@@ -1,0 +1,54 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+
+buildscript {
+    ext {
+        gradleVersion = '3.5.0'
+        kotlinVersion = '1.4.30'
+    }
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.android.tools.build:gradle:$gradleVersion"
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
+    implementation "com.google.code.gson:gson:2.8.2"
+
+    implementation 'org.javassist:javassist:3.26.0-GA'
+    implementation 'org.ow2.asm:asm:9.0'
+    implementation "com.squareup:javapoet:1.13.0"
+    testImplementation "junit:junit:4.12"
+}
+
+test.enabled = false
+test.setOnlyIf {
+    false
+}
+
+gradlePlugin {
+    plugins {
+        winkPlugin {
+            id = 'com.immomo.wink.plugin'
+            implementationClass = 'com.immomo.wink.WinkPlugin'
+        }
+    }
+}
+
+//apply from: '../wink-publish/upload_plugin.gradle'
+

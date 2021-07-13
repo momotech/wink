@@ -1,0 +1,26 @@
+apply plugin: 'java'
+
+ext {
+    bintrayName = 'wink-compiler'
+    artifact = 'xx'
+    libraryName = 'Wink compiler'
+    libraryDescription = 'A compiler for wink to hook'
+    libraryVersion = '1.0'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+dependencies {
+    compileOnly files('libs/tools.jar')
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
+    implementation 'com.google.auto.service:auto-service-annotations:1.0-rc7'
+
+    implementation 'com.squareup:javapoet:1.8.0'
+    implementation 'org.projectlombok:lombok:1.18.2'
+
+    implementation 'org.apache.commons:commons-lang3:3.5'
+    implementation 'org.apache.commons:commons-collections4:4.1'
+}

@@ -1,0 +1,11 @@
+*.iml
+.gradle
+.litebuild
+/local.properties
+.idea/*
+!.idea/copyright
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+ktlint

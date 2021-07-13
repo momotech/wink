@@ -1,0 +1,43 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+buildscript {
+    ext {
+        gradleVersion = '3.5.0'
+        kotlinVersion = '1.4.30'
+    }
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+repositories {
+    google()
+    mavenLocal()
+    mavenCentral()
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives sourceJar
+}
+
+dependencies {
+    runtime subprojects.collect { project(it.path) }
+}

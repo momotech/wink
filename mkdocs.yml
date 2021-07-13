@@ -1,0 +1,35 @@
+site_name: Wink
+pages:
+    - Overview: index.md
+    - Getting Started: [install.md,use.md]
+    - Fundamentals: [introduction.md,howwork.md]
+    - Help & Community:
+        - FAQ : faq.md
+        - StackOverFlow: "https://stackoverflow.com/questions/tagged/wink-build?sort=active"
+    - Change Log: changelog.md
+
+theme:
+  name: material
+  logo: 'images/wink.svg'
+  favicon: 'images/favicon.png'
+  palette:
+      primary: "black"
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - tables
+  - admonition

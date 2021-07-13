@@ -1,0 +1,54 @@
+<idea-plugin>
+  <id>com.immomo.wink</id>
+  <name>wink-build</name>
+  <version>1.0</version>
+  <vendor email="liu.jingwei@immomo.com" url="https://github.com/wink-build">MOMO</vendor>
+
+  <description><![CDATA[
+      android studio plugin for <a href='https://wink-build.github.io'>WinkBuild</a><br/><br/>
+      <br/><b>ISSUES</b><br/>
+      <a href='https://github.com/wink-build/wink-build.github.io/issues'>Submit Suggestions or Bugs</a><br/><br/>
+    ]]></description>
+
+  <change-notes><![CDATA[
+      First commit.<br>
+      <em>https://wink-build.github.io/site/changelog/</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="10.0"/>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>org.jetbrains.android</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>org.jetbrains.plugins.gradle</depends>
+  <depends>org.intellij.groovy</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="Wink" anchor="bottom" icon="/icons/wink4.svg"
+                factoryClass="com.immomo.wink.views.WinkToolWindowFactory" secondary="false"/>
+  </extensions>
+
+  <actions>
+    <action id="Plugin_Wink_Run" class="com.immomo.wink.WinkRunAction"
+            text="Wink Run" description="Wink Run">
+      <add-to-group group-id="ToolbarRunGroup" anchor="after" relative-to-action="RunnerActions"/>
+    </action>
+  </actions>
+  <applicationListeners>
+    <listener class="com.immomo.wink.listener.FileChangeListener"
+              topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    <listener class="com.immomo.wink.listener.ProjectListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
+
+  <project-components>
+    <component>
+      <interface-class>com.immomo.wink.views.WinkTerminal</interface-class>
+      <implementation-class>com.immomo.wink.views.WinkTerminal</implementation-class>
+    </component>
+  </project-components>
+</idea-plugin>
