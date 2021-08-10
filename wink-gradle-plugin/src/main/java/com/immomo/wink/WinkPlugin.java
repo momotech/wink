@@ -17,6 +17,7 @@
 package com.immomo.wink;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.api.ApplicationVariant;
 import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.InitEnvHelper;
@@ -30,6 +31,8 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
 
@@ -153,6 +156,31 @@ public class WinkPlugin implements Plugin<Project> {
         new InitEnvHelper().initEnv(project, true);
         // 产生快照
         DiffHelper.initAllSnapshot();
+
+        cacheApkFile(project);
+    }
+
+    //copy apk to wink dir
+    private void cacheApkFile(Project project) {
+        boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
+        if (hasAppPlugin) {
+            System.out.println("该module未包含com.android.application插件");
+            AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+            for (ApplicationVariant variant : androidExt.getApplicationVariants()) {
+                if (variant.getName().equals("debug")) {
+                    variant.getOutputs().all(baseVariantOutput -> {
+                        File srcFile = baseVariantOutput.getOutputFile();
+                        String winkPath = project.getRootDir() + Constant.IDEA + Constant.TAG;
+                        File destFile = new File(winkPath, Constant.TEMP_APK_NAME);
+                        try {
+                            Files.copy(srcFile.toPath(), destFile.toPath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void updateSnapShot() {

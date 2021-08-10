@@ -40,6 +40,7 @@ object Settings {
 
     @JvmStatic
     fun storeEnv(env: Env, filePath: String?) {
+//        println(env.toString())
         LocalCacheUtil.save2File(env, filePath)
         Settings.env = env
     }

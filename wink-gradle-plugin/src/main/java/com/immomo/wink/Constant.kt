@@ -10,6 +10,8 @@ object Constant {
 
     const val SHELL = "wink.sh"
 
+    const val TEMP_APK_NAME = "temp.apk"
+
     const val DOWNLOADURL = "https://download.immomo.com/android/wink_lib_%s.zip"
 
     const val RESOURCE_APK_SUFFIX = "_resources-debug.png"
