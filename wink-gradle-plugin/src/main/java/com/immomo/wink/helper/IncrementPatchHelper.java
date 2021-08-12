@@ -17,25 +17,25 @@
 package com.immomo.wink.helper;
 
 import com.immomo.wink.Settings;
+import com.immomo.wink.util.DeviceUtils;
+import com.immomo.wink.util.PathUtils;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
-
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.immomo.wink.Constant.RESOURCE_APK_SUFFIX;
 
 public class IncrementPatchHelper {
     public boolean patchToApp() {
+        List<String> devicesList = DeviceUtils.getConnectingDevices();
         if (Settings.data.classChangedCount <= 0 && !Settings.data.hasResourceChanged) {
             WinkLog.i("No changed, nothing to do.");
+            installAppIfDiffVersion(devicesList);
             return false;
         }
 
         WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.classChangedCount + "，是否新增改名：" + Settings.data.hasResourceChanged);
-
-        List<String> devicesList = getConnectingDevices();
 
         createPatchFile(devicesList);
         patchDex(devicesList);
@@ -48,29 +48,44 @@ public class IncrementPatchHelper {
         return true;
     }
 
-    @NotNull
-    private List<String> getConnectingDevices() {
-        List<String> devicesList = new ArrayList<>();
-
-        String cmds = "";
-        cmds += " source ~/.bash_profile";
-        cmds += '\n' + "adb devices ";
-
-        Utils.ShellResult shellResult = Utils.runShells(cmds);
-        List<String> resultList = shellResult.getResult();
-        if (resultList == null || resultList.size() <= 1) { // 只有一个设备或没有设备
-            WinkLog.throwAssert("USB 没有连接到设备");
-        } else {
-            List<String> devices = resultList.subList(1, resultList.size());
-            System.out.println("adb_devices 111 : " + devices.toString());
-            for (String deviceStr : devices) {
-                String [] arr = deviceStr.split("\\s+");
-                System.out.println(arr[0]);
-//                Utils.runShells("adb -s " + arr[0] + " install ");
-                devicesList.add(arr[0]);
+    // 检测手机中 Version 是否与本地相同，不同则 push 缓存 apk 和 Version 文件
+    private void installAppIfDiffVersion(List<String> devicesList) {
+//        WinkLog.i("installAppIfDiffVersion run !!!");
+        for (String deviceId : devicesList) {
+//            WinkLog.i("installAppIfDiffVersion --- deviceId : " + deviceId + " === versionPath : " + PathUtils.getVersionPath(deviceId));
+            boolean diffVersion = isDiffVersion(deviceId);
+            if (diffVersion) {
+                installLocalApk_Version(deviceId);
             }
         }
-        return devicesList;
+    }
+
+    /**
+     * 安装本地 Apk 并更新 Version 文件
+     */
+    private void installLocalApk_Version(String deviceId) {
+        WinkLog.i("与本机打包 Apk 版本不一致，安装本地版本 Apk 与补丁包");
+        Utils.runShells("adb -s " + deviceId + " install " + Settings.env.tmpPath + "/temp.apk");
+
+        String versionPath = PathUtils.getVersionPath(deviceId);
+
+        String localVersionPath = Settings.env.tmpPath + "/version/" + Settings.env.version + ".png";
+        Utils.runShells("source ~/.bash_profile\n" +
+                "adb -s " + deviceId + " shell rm -rf " + versionPath + "\n" +
+                "adb -s " + deviceId + " shell mkdir " + versionPath + "\n" +
+                "adb -s " + deviceId + " push " + localVersionPath + " " + versionPath);
+    }
+
+    private boolean isDiffVersion(String deviceId) {
+        boolean diffVersion = true;
+        Utils.ShellResult versionResult = Utils.runShells("adb -s " + deviceId + " shell ls " + PathUtils.getVersionPath(deviceId));
+        for (String s : versionResult.getResult()) {
+            if (s.contains(Settings.env.version)) {
+                diffVersion = false;
+                break;
+            }
+        }
+        return diffVersion;
     }
 
     public void createPatchFile(@NotNull List<String> devicesList) {
@@ -138,6 +153,10 @@ public class IncrementPatchHelper {
 
     public void restartApp(@NotNull List<String> devicesList) {
         for (String deviceId : devicesList) {
+            if (isDiffVersion(deviceId)) {
+                installLocalApk_Version(deviceId);
+                continue;
+            }
             String cmds = "";
             cmds += "source ~/.bash_profile";
             cmds += '\n' + "adb -s " + deviceId + " shell am force-stop " + Settings.env.debugPackageName;
@@ -154,7 +173,7 @@ public class IncrementPatchHelper {
         // 初始化数据
         new InitEnvHelper().initEnvFromCache(path);
 
-        List<String> connectingDevices = getConnectingDevices();
+        List<String> connectingDevices = DeviceUtils.getConnectingDevices();
         for (String connectingDevice : connectingDevices) {
             Utils.runShells(Utils.ShellOutput.ALL, "cd " + path,
                     "source ~/.bash_profile",

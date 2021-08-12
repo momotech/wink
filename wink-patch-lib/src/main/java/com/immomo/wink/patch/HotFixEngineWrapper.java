@@ -104,6 +104,7 @@ public final class HotFixEngineWrapper {
         Log.e("weijiangnan", var10001.append(classs != null ? classs.hashCode() : 0).toString());
     }
 
+    //TODO-YWB：检测 Version.png 文件与 BuildConfig 版本是否相同，不同则删除对应文件
     public final void loadPatch( Context context) {
         File dexFile = FixDexUtil.getDexPatchFile(context);
         if (dexFile != null && dexFile.exists() && dexFile.canRead()) {

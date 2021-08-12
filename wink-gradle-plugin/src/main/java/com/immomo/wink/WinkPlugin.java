@@ -22,7 +22,10 @@ import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.InitEnvHelper;
 import com.immomo.wink.tasks.WinkInitTask;
+import com.immomo.wink.util.DeviceUtils;
 import com.immomo.wink.util.GradleUtils;
+import com.immomo.wink.util.PathUtils;
+import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 import org.gradle.api.Action;
@@ -33,6 +36,7 @@ import org.gradle.api.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
 
@@ -158,6 +162,45 @@ public class WinkPlugin implements Plugin<Project> {
         DiffHelper.initAllSnapshot();
 
         cacheApkFile(project);
+
+        pushVersionFileToDevice(project);
+    }
+
+    // 推送本次打包 Version.png 到设备
+    private void pushVersionFileToDevice(Project project) {
+        WinkLog.d("Settings.env.version : " + Settings.env.version + " --- Settings.data.newVersion : " + Settings.data.newVersion);
+
+        List<String> connectingDevices = DeviceUtils.getConnectingDevices();
+
+        for (String deviceId : connectingDevices) {
+            String localVersionFilePath = project.getRootDir() + "/.idea/" + Settings.NAME + "/version/";
+            File file = new File(localVersionFilePath);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            deleteDir(file, false);
+            File versionFile = new File(localVersionFilePath + "/" + Settings.env.version + ".png");
+            try {
+                versionFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String versionPath = PathUtils.getVersionPath(deviceId);
+            Utils.runShells("source ~/.bash_profile\n" +
+                    "adb -s " + deviceId + " shell rm -rf " + versionPath + "\n" +
+                    "adb -s " + deviceId + " shell mkdir " + versionPath + "\n" +
+                    "adb -s " + deviceId + " push " + versionFile.getAbsolutePath() + " " + versionPath);
+        }
+    }
+
+    public void deleteDir(File file, boolean deleteSelf) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles())
+                deleteDir(f, true);
+        }
+        if (deleteSelf) {
+            file.delete();
+        }
     }
 
     //copy apk to wink dir
@@ -170,8 +213,11 @@ public class WinkPlugin implements Plugin<Project> {
                 if (variant.getName().equals("debug")) {
                     variant.getOutputs().all(baseVariantOutput -> {
                         File srcFile = baseVariantOutput.getOutputFile();
-                        String winkPath = project.getRootDir() + Constant.IDEA + Constant.TAG;
+                        String winkPath = project.getRootDir() + "/" + Constant.IDEA + "/" + Constant.TAG;
                         File destFile = new File(winkPath, Constant.TEMP_APK_NAME);
+                        if (destFile.exists()) {
+                            destFile.delete();
+                        }
                         try {
                             Files.copy(srcFile.toPath(), destFile.toPath());
                         } catch (IOException e) {
