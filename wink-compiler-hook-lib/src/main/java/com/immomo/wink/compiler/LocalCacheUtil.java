@@ -48,8 +48,8 @@ public class LocalCacheUtil {
             oo = new ObjectOutputStream(new FileOutputStream(file));
             oo.writeObject(value);
             oo.close();
-        } catch (FileNotFoundException e) {
         } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             try {
                 if (oo != null) {

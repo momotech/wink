@@ -3,10 +3,7 @@ package com.immomo.wink.compiler;
 import com.google.auto.service.AutoService;
 import com.sun.tools.javac.code.Symbol;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,32 +17,40 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 @AutoService(Processor.class)
-@SupportedAnnotationTypes({"com.immomo.wink.compiler.HookEmptyInject"})
+@SupportedAnnotationTypes({"*"})
 public class WinkCompilerHookProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        System.out.println("=======================");
+        System.out.println("   process run !!!   ");
+        System.out.println("=======================");
         try {
-            File file = new File("../.idea/wink/annotation/whitelist");
-            if (!file.exists()) {
-                return false;
-            }
+//            File file = new File("../.idea/wink/annotation/whitelist");
+//            if (!file.exists()) {
+//                return false;
+//            }
+//
+//            String annotationWhiteListStr = null;
+//            try {
+//                BufferedReader input = new BufferedReader(new FileReader(file));
+//                annotationWhiteListStr = input.readLine();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            if (annotationWhiteListStr == null
+//                    || annotationWhiteListStr.isEmpty()) {
+//                return false;
+//            }
+//
+//            String[] whiteList = annotationWhiteListStr.split(",");
 
-            String annotationWhiteListStr = null;
-            try {
-                BufferedReader input = new BufferedReader(new FileReader(file));
-                annotationWhiteListStr = input.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            set.iterator().next().getQualifiedName()
 
-            if (annotationWhiteListStr == null
-                    || annotationWhiteListStr.isEmpty()) {
-                return false;
-            }
+            String[] whiteList = new String[]{"com.alibaba.android.arouter.facade.annotation.Route", "butterknife.BindView"};
 
-            String[] whiteList = annotationWhiteListStr.split(",");
-
+//            String annotation = "com.alibaba.android.arouter.facade.annotation.Route";
             ProcessorMapping processorMapping = new ProcessorMapping();
             for (String annotation: whiteList) {
                 try {
@@ -90,12 +95,17 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
             }
 
             if (processorMapping.annotation2FilesMapping.size() > 0) {
-                File fileDir = new File("../.idea/wink/annotation/");
+                String userDirectory = new File("").getAbsolutePath();
+                System.out.println("userDirectory ===>>>>>>>>>> " + userDirectory);
+
+                File fileDir = new File(userDirectory + "/.idea/wink/annotation/");
                 if (!fileDir.exists()) {
                     fileDir.mkdir();
                 }
 
-                LocalCacheUtil.save2File(processorMapping, "../.idea/wink/annotation/mapping");
+                System.out.println("processorMapping ===>>>>>>>>>>");
+                System.out.println(processorMapping.toString());
+                LocalCacheUtil.save2File(processorMapping, userDirectory + "/.idea/wink/annotation/mapping");
             }
 
         } catch (Exception e) {

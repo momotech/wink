@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        System.out.println("Route.class.getCanonicalName() : " + Route.class.getCanonicalName());
         Button button = findViewById(R.id.button);
         button.setBackgroundColor(Color.BLACK);
 
