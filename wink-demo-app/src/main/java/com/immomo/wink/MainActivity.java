@@ -8,11 +8,13 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.immomo.wink.utils.ZZ;
 
 @Route(path = "/com/Activity1")
@@ -34,7 +36,15 @@ public class MainActivity extends AppCompatActivity {
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
-            Toast.makeText(this, "221" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
+            ARouter.getInstance().build("/com/Activity333").navigation();
+        });
+
+        textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ARouter.getInstance().build("/com/Activity22").navigation();
+                return false;
+            }
         });
 //        loadMusic(R.raw.audio_match);
     }

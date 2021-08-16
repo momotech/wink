@@ -17,7 +17,9 @@
 package com.immomo.wink.helper;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.api.AnnotationProcessorOptions;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -287,12 +290,12 @@ public class InitEnvHelper {
 
         Object extension = project.getExtensions().findByName("android");
         JavaCompile javaCompile = null;
-//        String processorArgs = "";
+        String processorArgs = "";
         if (extension == null) {
             return;
         } else if (extension instanceof AppExtension) {
-//            processorArgs = getProcessorArgs(((AppExtension) extension).getDefaultConfig()
-//                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+            processorArgs = getProcessorArgs(((AppExtension) extension).getDefaultConfig()
+                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
 
             Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
             while (itApp.hasNext()) {
@@ -303,8 +306,8 @@ public class InitEnvHelper {
                 }
             }
         } else if (extension instanceof LibraryExtension) {
-//            processorArgs = getProcessorArgs(((LibraryExtension) extension).getDefaultConfig()
-//                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+            processorArgs = getProcessorArgs(((LibraryExtension) extension).getDefaultConfig()
+                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
 
             Iterator<LibraryVariant> it = ((LibraryExtension) extension).getLibraryVariants().iterator();
             while (it.hasNext()) {
@@ -315,6 +318,8 @@ public class InitEnvHelper {
                 }
             }
         }
+
+        WinkLog.d("==================== processorArgs : " + processorArgs);
 
         if (javaCompile == null) {
             return;
@@ -337,39 +342,42 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
-        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
+        StringBuilder processorpath = new StringBuilder(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
         // todo apt
-//        if (Settings.env.kaptTaskParam != null &&
-//                Settings.env.kaptTaskParam.processorOptions != null) {
-//            for (File file : Settings.env.kaptTaskParam.processingClassPath) {
-//                if (processorpath != null && !processorpath.isEmpty()) {
-//                    processorpath += ":";
-//                }
-//
-//                processorpath += file.getAbsolutePath();
-//            }
-//        }
+        if (Settings.env.kaptTaskParam != null &&
+                Settings.env.kaptTaskParam.processorOptions != null) {
+            for (File file : Settings.env.kaptTaskParam.processingClassPath) {
+                if (processorpath != null && (processorpath.length() > 0)) {
+                    processorpath.append(":");
+                }
+
+                processorpath.append(file.getAbsolutePath());
+            }
+        }
+
+        WinkLog.d(" ==============> processorpath : " + processorpath);
 
         // todo apt
-//        if (!processorpath.trim().isEmpty()) {
-//            args.add("-processorpath");
-//            args.add(processorpath);
-//        }
-//
-//        //注解处理器参数
-//        if (extension instanceof BaseExtension) {
-//            StringBuilder aptOptions = new StringBuilder();
-//            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
-//            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
-//
-//            // todo apt
-////            // add kapt args
-////            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
-////                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
-////            }
-//
-//            args.add(aptOptions.toString());
-//        }
+        if (!processorpath.toString().trim().isEmpty()) {
+            args.add("-processorpath");
+            args.add(processorpath.toString());
+        }
+
+        //注解处理器参数
+        if (extension instanceof BaseExtension) {
+            StringBuilder aptOptions = new StringBuilder();
+            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
+
+            // todo apt
+            // add kapt args
+            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
+                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
+            }
+
+            args.add(aptOptions.toString());
+            WinkLog.d(" ------------------- aptOptions : " + aptOptions);
+        }
 
         args.add("-classpath");
 

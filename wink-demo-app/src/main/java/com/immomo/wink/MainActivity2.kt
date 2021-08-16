@@ -1,16 +1,17 @@
 package com.immomo.wink
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.alibaba.android.arouter.facade.annotation.Route
 
-@Route(path = "/com/Activity2")
+@Route(path = "/com/Activity22")
 class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main2)
-        Log.e("Test","dsaaa");
+        Toast.makeText(this, "Activity2", Toast.LENGTH_SHORT).show()
+        Log.e("Test", "???111");
     }
 }
