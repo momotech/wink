@@ -25,6 +25,9 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
         System.out.println("=======================");
         System.out.println("   process run !!!   ");
         System.out.println("=======================");
+
+        System.out.println("TypeElement ===>>> : " + set.toString());
+
         try {
 //            File file = new File("../.idea/wink/annotation/whitelist");
 //            if (!file.exists()) {

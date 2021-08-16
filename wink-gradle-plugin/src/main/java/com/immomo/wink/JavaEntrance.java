@@ -36,6 +36,10 @@ public class JavaEntrance {
             return;
         }
 
+        if (!helper.isAnnotationMappingExist(path)) {
+            WinkLog.i("===>>> 注解映射文件不存在，本次编译不会更新注解。");
+        }
+
         // Diff file changed
         runDiff();
 

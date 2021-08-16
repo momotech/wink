@@ -1,5 +1,7 @@
 package com.immomo.wink.util;
 
+import com.immomo.wink.Constant;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,7 +25,7 @@ public class LocalCacheUtil {
             }
         } catch (Exception e) {
             delete(file);
-//            Log.v(Constant.TAG, e.getMessage());
+            WinkLog.d(Constant.TAG, e.getMessage());
         } finally {
             try {
                 if (ois != null) {

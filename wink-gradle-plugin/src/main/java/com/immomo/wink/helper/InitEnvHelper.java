@@ -69,6 +69,7 @@ public class InitEnvHelper {
 
         // Data每次初始化
         Settings.initData();
+        WinkLog.d("Settings.annotationMappingInfo ==============>>>>>>>>>>>>>>>>>>>>>>> : " + Settings.data.processorMapping.toString());
     }
 
     public void createEnv(Project project) {
@@ -170,6 +171,12 @@ public class InitEnvHelper {
     public boolean isEnvExist(String path) {
         String envFilePath = path + "/.idea/" + Settings.NAME + "/env";
         File envFile = new File(envFilePath);
+        return envFile.exists();
+    }
+
+    public boolean isAnnotationMappingExist(String path) {
+        String annotationFilePath = path + "/.idea/" + Settings.NAME + "/annotation/mapping";
+        File envFile = new File(annotationFilePath);
         return envFile.exists();
     }
 

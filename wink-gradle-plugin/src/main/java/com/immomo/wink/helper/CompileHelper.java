@@ -30,6 +30,19 @@ public class CompileHelper {
         createDexPatch();
     }
 
+    private List<String> getChangedAnnoList() {
+//        for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
+//            for (String changedKotlinFile : project.changedKotlinFiles) {
+//                Settings.data.
+//                changedKotlinFile
+//            }
+//            for (String changedJavaFile : project.changedJavaFiles) {
+//
+//            }
+//        }
+        return null;
+    }
+
     private int compileJava(Settings.ProjectTmpInfo project) {
         if (project.changedJavaFiles.size() <= 0) {
             return 0;
