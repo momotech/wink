@@ -12,6 +12,6 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
         Toast.makeText(this, "Activity2", Toast.LENGTH_SHORT).show()
-        Log.e("Test", "???123");
+        Log.e("Test", "111");
     }
 }

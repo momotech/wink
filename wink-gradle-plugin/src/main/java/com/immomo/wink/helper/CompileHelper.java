@@ -7,6 +7,7 @@ import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,10 @@ public class CompileHelper {
             file.mkdirs();
         }
 
+        //TODO-YZH 变更注解的文件列表
+        List<String> changedAnnotationList = getChangedAnnotationList();
+        WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
+
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             compileKotlin(project);
         }
@@ -30,17 +35,41 @@ public class CompileHelper {
         createDexPatch();
     }
 
-    private List<String> getChangedAnnoList() {
-//        for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
-//            for (String changedKotlinFile : project.changedKotlinFiles) {
-//                Settings.data.
-//                changedKotlinFile
-//            }
-//            for (String changedJavaFile : project.changedJavaFiles) {
-//
-//            }
-//        }
-        return null;
+    /**
+     * 获取所有修改文件所影响的注解类
+     */
+    private List<String> getChangedAnnotationList() {
+        List<String> annotationFiles = new ArrayList<>();
+        if (Settings.data.processorMapping == null) {
+            WinkLog.i("注解映射关系为空，本次无法编译注解");
+            return annotationFiles;
+        }
+        WinkLog.d("Settings.data.processorMapping : " + Settings.data.processorMapping.toString());
+        for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
+            // kotlin 记录的路径为 /Users/momo/Documents/MomoProject/wink/wink-demo-app/build/tmp/kapt3/stubs/debug/com/immomo/wink/MainActivity2.java
+            for (String changedKotlinFile : project.changedKotlinFiles) {
+                WinkLog.d("changedKotlinFile <><><><><><>" + changedKotlinFile);
+                List<String> annotations = Settings.data.processorMapping.file2AnnotationsMapping.get(changedKotlinFile);
+                if (annotations == null || annotations.size() == 0) {
+                    continue;
+                }
+                for (String annotation : annotations) {
+                    List<String> fileList = Settings.data.processorMapping.annotation2FilesMapping.get(annotation);
+                    annotationFiles.addAll(fileList);
+                }
+            }
+            for (String changedJavaFile : project.changedJavaFiles) {
+                List<String> annotations = Settings.data.processorMapping.file2AnnotationsMapping.get(changedJavaFile);
+                if (annotations == null || annotations.size() == 0) {
+                    continue;
+                }
+                for (String annotation : annotations) {
+                    List<String> fileList = Settings.data.processorMapping.annotation2FilesMapping.get(annotation);
+                    annotationFiles.addAll(fileList);
+                }
+            }
+        }
+        return annotationFiles;
     }
 
     private int compileJava(Settings.ProjectTmpInfo project) {

@@ -64,7 +64,7 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                         if (element instanceof Symbol.VarSymbol) {
                             symbol = (Symbol.ClassSymbol) ((Symbol.VarSymbol) element).owner;
                         }
-
+//                        element.getAnnotation(Metadata.class);
                         if (element instanceof Symbol.ClassSymbol) {
                             symbol = (Symbol.ClassSymbol) element;
                         }
@@ -77,18 +77,31 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                         fileField.setAccessible(true);
                         File sourceFile = (File) fileField.get(symbol.sourcefile);
 
+                        /*
+                         * 目前拿到的文件是 kapt 生成 stubs 的 .java 文件，没有好的方式直接获取到 .kt 文件
+                         * /Users/momo/Documents/MomoProject/wink/wink-demo-app/build/tmp/kapt3/stubs/debug/com/immomo/wink/MainActivity2.java
+                         * /Users/momo/Documents/MomoProject/wink/wink-demo-app/   src/main/java                 /com/immomo/wink/MainActivity3.java
+                         * /Users/momo/Documents/MomoProject/wink/wink-demo-app/   build/tmp/kapt3/stubs/debug   /com/immomo/wink/MainActivity2.java
+                         */
+
+                        String sourceFilePath = sourceFile.getAbsolutePath();
+
+                        if (sourceFilePath.contains("build/tmp/kapt3/stubs/debug")) {
+                            sourceFilePath = sourceFilePath.replace("build/tmp/kapt3/stubs/debug", "src/main/java").replace(".java", ".kt");
+                        }
+
                         if (sourceFile.exists()) {
                             if (!processorMapping.annotation2FilesMapping
                                     .containsKey(annotation)) {
                                 processorMapping.annotation2FilesMapping.put(annotation, new ArrayList<String>());
                             }
-                            processorMapping.annotation2FilesMapping.get(annotation).add(sourceFile.getAbsolutePath());
+                            processorMapping.annotation2FilesMapping.get(annotation).add(sourceFilePath);
 
                             if (!processorMapping.file2AnnotationsMapping
-                                    .containsKey(sourceFile.getAbsolutePath())) {
-                                processorMapping.file2AnnotationsMapping.put(sourceFile.getAbsolutePath(), new ArrayList<String>());
+                                    .containsKey(sourceFilePath)) {
+                                processorMapping.file2AnnotationsMapping.put(sourceFilePath, new ArrayList<String>());
                             }
-                            processorMapping.file2AnnotationsMapping.get(sourceFile.getAbsolutePath()).add(annotation);
+                            processorMapping.file2AnnotationsMapping.get(sourceFilePath).add(annotation);
                         }
                     }
                     // 写入文件
