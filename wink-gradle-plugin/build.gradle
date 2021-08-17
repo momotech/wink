@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30"
     implementation "com.android.tools.build:gradle:$gradleVersion"
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
