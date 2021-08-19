@@ -83,7 +83,9 @@ object Settings {
             @JvmField var defaultFlavor: String = "",
             @JvmField var variantName: String = "debug",
             @JvmField var kaptTaskParam: KaptTaskParam? = null,
-            @JvmField var branch: String = "debug"
+            @JvmField var kaptCompileClasspath: String? = null,
+            @JvmField var jvmTarget: String? = null,
+            @JvmField var branch: String = "debug",
     ) : Serializable
 
     data class Data(

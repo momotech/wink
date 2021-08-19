@@ -166,7 +166,7 @@ public class InitEnvHelper {
         }
 
         StringBuilder sb = new StringBuilder();
-        String[] injects = new String[] { "com.alibaba.android.arouter.facade.annotation.Route" };
+        String[] injects = new String[]{"com.alibaba.android.arouter.facade.annotation.Route"};
         for (String inject : injects) {
             sb.append(inject);
             sb.append(",");
@@ -382,7 +382,7 @@ public class InitEnvHelper {
         if (extension instanceof BaseExtension) {
             StringBuilder aptOptions = new StringBuilder();
             AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
-            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
+            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ", k, v)));
 
             // todo apt
             // add kapt args
@@ -404,7 +404,7 @@ public class InitEnvHelper {
         args.add(fixedInfo.classPath);
 
         args.add("-d");
-        args.add(Settings.env.tmpPath+ "/tmp_class");
+        args.add(Settings.env.tmpPath + "/tmp_class");
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < args.size(); i++) {
@@ -431,6 +431,14 @@ public class InitEnvHelper {
 //            kotlinArgs.add(processorArgs);
 //        }
 
+
+        Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
+        Settings.env.kaptCompileClasspath = kaptTaskParam.compileClassPath + ":"
+                + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes"
+                + ":" + Settings.env.tmpPath + "/tmp_class"
+                + ":" + project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r";
+
+        Settings.env.jvmTarget = "-jvm-target " + getSupportVersion(javaCompile.getTargetCompatibility());
         kotlinArgs.add("-jvm-target");
         kotlinArgs.add(getSupportVersion(javaCompile.getTargetCompatibility()));
 
@@ -450,7 +458,7 @@ public class InitEnvHelper {
         StringBuilder sb = new StringBuilder();
         if (argsA.size() > 0) {
             boolean firstA = true;
-            for (String key: argsA.keySet()) {
+            for (String key : argsA.keySet()) {
                 if (!firstA) {
                     sb.append(".");
                 }
@@ -558,7 +566,7 @@ public class InitEnvHelper {
                                       HashSet<String> hasAddProject, String productFlavor, String buildType) {
         initProjectData(node, project);
 
-        String[] compileNames = new String[] {"compile", "implementation", "api", "debugCompile"};
+        String[] compileNames = new String[]{"compile", "implementation", "api", "debugCompile"};
         for (String name : compileNames) {
             Configuration compile = project.getConfigurations().findByName(name);
             if (compile != null) {
@@ -588,7 +596,7 @@ public class InitEnvHelper {
                     node.children.add(childNode);
                     hasAddProject.add(name);
 
-                    handleAndroidProject(dp.getDependencyProject(), childNode,  hasAddProject, productFlavor, buildType);
+                    handleAndroidProject(dp.getDependencyProject(), childNode, hasAddProject, productFlavor, buildType);
                 }
             }
         });

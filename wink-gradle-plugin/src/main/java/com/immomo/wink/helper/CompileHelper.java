@@ -3,14 +3,21 @@ package com.immomo.wink.helper;
 
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
+import com.immomo.wink.util.KaptEncodeUtils;
 import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class CompileHelper {
 
@@ -23,6 +30,10 @@ public class CompileHelper {
         //TODO-YZH 变更注解的文件列表
         List<String> changedAnnotationList = getChangedAnnotationList();
         WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
+
+
+        // TODO: 8/17/21
+        compileKapt(changedAnnotationList);
 
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             compileKotlin(project);
@@ -96,6 +107,105 @@ public class CompileHelper {
 
         return project.changedJavaFiles.size();
     }
+
+    // TODO: 8/17/21
+    private void compileKapt(List<String> changedAnnotationList) {
+        if (changedAnnotationList.size() <= 0) {
+            WinkLog.d("LiteBuild: ================> 没有 annotation 文件变更。");
+            return;
+        }
+        String kotlinc = getKotlinc();
+        try {
+            String javaHomePath = Settings.env.javaHome;
+            javaHomePath = javaHomePath.replace(" ", "\\ ");
+            Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
+            StringBuilder processingClassPath = new StringBuilder();
+            for (File path : kaptTaskParam.processingClassPath) {
+                if (path.getAbsolutePath().contains("org.projectlombok")
+                        || path.getAbsolutePath().contains("wink-compiler-hook-lib")
+                        || path.getAbsolutePath().contains("butterknife-compiler")) {
+                    continue;
+                }
+                processingClassPath.append(":");
+                processingClassPath.append(path.getAbsolutePath());
+            }
+
+            Map<String, String> apoptionsMap = new HashMap<>();
+            for (String processorOption : kaptTaskParam.processorOptions) {
+                String[] split = processorOption.split(":");
+                String[] split1 = split[split.length - 1].split("=");
+                apoptionsMap.put(split1[0], split1[1]);
+            }
+
+            StringBuilder changedAnnotationSb = new StringBuilder();
+            for (String s : changedAnnotationList) {
+                changedAnnotationSb.append(" ");
+                changedAnnotationSb.append(s);
+            }
+
+            String shellCommand = "sh " + kotlinc + " \\\n"
+                    + "-verbose \\\n"
+                    + "-jdk-home " + javaHomePath + " \\\n"
+                    + "-classpath " + Settings.env.kaptCompileClasspath + processingClassPath + " \\\n"
+                    + getKapt3Params(KaptEncodeUtils.encodeList(apoptionsMap)) + getApClasspath(kaptTaskParam.processingClassPath)
+                    + getKotlinAnnotationProcessing()
+                    + getJdkToolsPath()
+                    + Settings.env.jvmTarget + " \\\n"
+                    + "-d " + ".idea/litebuild" + "/tmp_class" + changedAnnotationSb.toString();
+
+
+            WinkLog.d("wangzihang1", shellCommand);
+//            WinkLog.d("wangzihang2", Settings.env.javaHome);
+//            WinkLog.d("wangzihang5", Settings.env.kaptCompileClasspath);
+//            WinkLog.d("wangzihang4", processingClassPath.toString());
+//            WinkLog.d("wangzihang5", getKotlinAnnotationProcessing());
+//            WinkLog.d("wangzihang6", getKaptParams(KaptEncodeUtils.encodeList(map)));
+
+            Utils.ShellResult result = Utils.runShells(shellCommand);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Settings.data.classChangedCount += 1;
+    }
+
+    private String getApClasspath(Set<? extends File> processingClassPath) {
+        StringBuilder sb = new StringBuilder();
+        for (File path : processingClassPath) {
+            if (path.getAbsolutePath().contains("org.projectlombok")
+                    || path.getAbsolutePath().contains("wink-compiler-hook-lib")
+                    || path.getAbsolutePath().contains("butterknife-compiler")) {
+                continue;
+            }
+            sb.append("-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=");
+            sb.append(path.getAbsolutePath());
+            sb.append(" \\\n");
+        }
+
+        return sb.toString();
+    }
+
+
+    private String getKotlinAnnotationProcessing() {
+        String kotlincPath = getKotlinc();
+        return "-Xplugin=" + kotlincPath.replace("bin/kotlinc", "lib/kotlin-annotation-processing.jar \\\n");
+    }
+
+    private String getJdkToolsPath() {
+        String javaHomePath = Settings.env.javaHome;
+        return "-Xplugin=" + javaHomePath.replace(" ", "\\ ").replace("Home/jre", "Home/lib/tools.jar \\\n");
+    }
+
+
+    private String getKapt3Params(String kaptEncodeOption) {
+        return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/litebuild/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/litebuild/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/litebuild/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:apoptions=" + kaptEncodeOption + " \\\n";
+    }
+
 
     private void compileKotlin(Settings.ProjectTmpInfo project) {
         if (project.changedKotlinFiles.size() <= 0) {
