@@ -373,28 +373,30 @@ public class InitEnvHelper {
         WinkLog.d(" ==============> processorpath : " + processorpath);
 
         // todo apt
-        if (!processorpath.toString().trim().isEmpty()) {
-            args.add("-processorpath");
-            args.add(processorpath.toString());
-        }
+//        if (!processorpath.toString().trim().isEmpty()) {
+//            args.add("-processorpath");
+//            args.add(processorpath.toString());
+//        }
 
         //注解处理器参数
-        if (extension instanceof BaseExtension) {
-            StringBuilder aptOptions = new StringBuilder();
-            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
-            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ", k, v)));
-
-            // todo apt
-            // add kapt args
-            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
-                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
-            }
-
-            args.add(aptOptions.toString());
-            WinkLog.d(" ------------------- aptOptions : " + aptOptions);
-        }
+//        if (extension instanceof BaseExtension) {
+//            StringBuilder aptOptions = new StringBuilder();
+//            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+//            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ", k, v)));
+//
+//            // todo apt
+//            // add kapt args
+//            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
+//                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
+//            }
+//
+//            args.add(aptOptions.toString());
+//            WinkLog.d(" ------------------- aptOptions : " + aptOptions);
+//        }
 
         args.add("-classpath");
+
+        WinkLog.d(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + javaCompile.getClasspath().getAsPath());
 
         fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
                 + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes"

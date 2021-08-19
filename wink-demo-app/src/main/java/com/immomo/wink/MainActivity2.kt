@@ -11,7 +11,7 @@ class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
-        Toast.makeText(this, "Activity2", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Activity222222==", Toast.LENGTH_SHORT).show()
         Log.e("Test", "123");
     }
 }

@@ -151,7 +151,7 @@ public class CompileHelper {
                     + getKotlinAnnotationProcessing()
                     + getJdkToolsPath()
                     + Settings.env.jvmTarget + " \\\n"
-                    + "-d " + ".idea/litebuild" + "/tmp_class" + changedAnnotationSb.toString();
+                    + "-d " + ".idea/wink" + "/tmp_class" + changedAnnotationSb.toString();
 
 
             WinkLog.d("wangzihang1", shellCommand);
@@ -198,9 +198,9 @@ public class CompileHelper {
 
 
     private String getKapt3Params(String kaptEncodeOption) {
-        return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/litebuild/tmp_class \\\n" +
-                "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/litebuild/tmp_class \\\n" +
-                "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/litebuild/tmp_class \\\n" +
+        return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/wink/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/wink/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/wink/tmp_class \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:apoptions=" + kaptEncodeOption + " \\\n";

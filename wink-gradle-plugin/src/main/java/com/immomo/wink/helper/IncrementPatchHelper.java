@@ -78,7 +78,8 @@ public class IncrementPatchHelper {
 
     private boolean isDiffVersion(String deviceId) {
         boolean diffVersion = true;
-        Utils.ShellResult versionResult = Utils.runShells("adb -s " + deviceId + " shell ls " + PathUtils.getVersionPath(deviceId));
+        String lsCmd = "adb -s " + deviceId + " shell ls " + PathUtils.getVersionPath(deviceId);
+        Utils.ShellResult versionResult = Utils.runShells(lsCmd);
         for (String s : versionResult.getResult()) {
             if (s.contains(Settings.env.version)) {
                 diffVersion = false;
@@ -92,9 +93,9 @@ public class IncrementPatchHelper {
         for (int i = 0; i < devicesList.size(); i++) {
             String deviceId = devicesList.get(i);
             String patch = "/sdcard/Android/data/" + Settings.env.debugPackageName;
-            Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb -s " + deviceId + "shell ls " + patch);
+            Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb -s " + deviceId + " shell ls " + patch);
             boolean noPermission = false;
-            Utils.runShells(Utils.ShellOutput.NONE, "adb -s " + deviceId + "shell mkdir " + patch);
+            Utils.runShells(Utils.ShellOutput.NONE, "adb -s " + deviceId + " shell mkdir " + patch);
             for (String error : result.getErrorResult()) {
                 if (error.contains("Permission denied")) {
                     // 标志没文件权限
@@ -109,10 +110,11 @@ public class IncrementPatchHelper {
                 Settings.data.patchPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
             }
 
-            Utils.runShells(Utils.ShellOutput.NONE, "source ~/.bash_profile",
-                    "adb -s " + deviceId + " shell mkdir " + Settings.data.patchPath);
+            String mkdirStr = "adb -s " + deviceId + " shell mkdir " + Settings.data.patchPath;
+            Utils.runShells(Utils.ShellOutput.NONE, "source ~/.bash_profile", mkdirStr);
 
-            result = Utils.runShells("adb -s " + deviceId + " shell ls " + Settings.data.patchPath);
+            String lsStr = "adb -s " + deviceId + " shell ls " + Settings.data.patchPath;
+            result = Utils.runShells(lsStr);
             if (result.getErrorResult().size() > 0) {
                 WinkLog.throwAssert("Can not create patch file " + Settings.data.patchPath);
             }

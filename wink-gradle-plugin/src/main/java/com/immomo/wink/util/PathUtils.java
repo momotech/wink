@@ -9,9 +9,9 @@ public class PathUtils {
     @NotNull
     public static String getVersionPath(String deviceId) {
         String patch = "/sdcard/Android/data/" + Settings.env.debugPackageName;
-        Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb -s " + deviceId + "shell ls " + patch);
+        Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb -s " + deviceId + " shell ls " + patch);
         boolean noPermission = false;
-        Utils.runShells(Utils.ShellOutput.NONE, "adb -s " + deviceId + "shell mkdir " + patch);
+        Utils.runShells(Utils.ShellOutput.NONE, "adb -s " + deviceId + " shell mkdir " + patch);
         for (String error : result.getErrorResult()) {
             if (error.contains("Permission denied")) {
                 noPermission = true; // 没文件权限
