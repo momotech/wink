@@ -123,7 +123,7 @@ public class CompileHelper {
             for (File path : kaptTaskParam.processingClassPath) {
                 if (path.getAbsolutePath().contains("org.projectlombok")
                         || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-//                        || path.getAbsolutePath().contains("butterknife-compiler")
+                        || path.getAbsolutePath().contains("butterknife-compiler")
                 ) {
                     continue;
                 }
@@ -175,7 +175,7 @@ public class CompileHelper {
         for (File path : processingClassPath) {
             if (path.getAbsolutePath().contains("org.projectlombok")
                     || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-//                    || path.getAbsolutePath().contains("butterknife-compiler")
+                    || path.getAbsolutePath().contains("butterknife-compiler")
             ) {
                 continue;
             }
