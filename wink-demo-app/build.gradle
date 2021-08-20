@@ -42,7 +42,15 @@ android {
     }
 }
 
+kapt {
+    arguments {
+        arg('eventBusIndex', 'com.immomo.wink.MyEventBusIndex')
+    }
+}
+
 dependencies {
+    implementation 'org.greenrobot:eventbus:3.2.0'
+    kapt "org.greenrobot:eventbus-annotation-processor:3.2.0"
     implementation project(':wink-patch-lib')
     implementation project(':wink-demo-lib')
     implementation 'com.jakewharton:butterknife:10.2.3'
