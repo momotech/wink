@@ -123,7 +123,8 @@ public class CompileHelper {
             for (File path : kaptTaskParam.processingClassPath) {
                 if (path.getAbsolutePath().contains("org.projectlombok")
                         || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-                        || path.getAbsolutePath().contains("butterknife-compiler")) {
+//                        || path.getAbsolutePath().contains("butterknife-compiler")
+                ) {
                     continue;
                 }
                 processingClassPath.append(":");
@@ -151,7 +152,7 @@ public class CompileHelper {
                     + getKotlinAnnotationProcessing()
                     + getJdkToolsPath()
                     + Settings.env.jvmTarget + " \\\n"
-                    + "-d " + ".idea/wink" + "/tmp_class" + changedAnnotationSb.toString();
+                    + "-d " + Settings.env.tmpPath + "/tmp_class" + changedAnnotationSb.toString();
 
 
             WinkLog.d("wangzihang1", shellCommand);
@@ -174,7 +175,8 @@ public class CompileHelper {
         for (File path : processingClassPath) {
             if (path.getAbsolutePath().contains("org.projectlombok")
                     || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-                    || path.getAbsolutePath().contains("butterknife-compiler")) {
+//                    || path.getAbsolutePath().contains("butterknife-compiler")
+            ) {
                 continue;
             }
             sb.append("-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=");
