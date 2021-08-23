@@ -29,6 +29,9 @@ public class CompileHelper {
 
         //TODO-YZH 变更注解的文件列表
         List<String> changedAnnotationList = getChangedAnnotationList();
+        if (changedAnnotationList.size() > 0){
+            changedAnnotationList.add("/Users/momo/winkDev/wink-gradle-plugin/src/main/java/com/immomo/wink/KaptCompileFile.kt");
+        }
         WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
 
 
