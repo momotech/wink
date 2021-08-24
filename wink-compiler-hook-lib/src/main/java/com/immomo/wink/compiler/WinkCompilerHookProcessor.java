@@ -107,7 +107,32 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
 //            set.iterator().next().getQualifiedName()
 
-            String[] whiteList = new String[]{"com.alibaba.android.arouter.facade.annotation.Route", "butterknife.BindView"};
+            String[] whiteList = new String[]{
+                    "com.alibaba.android.arouter.facade.annotation.Route",
+                    "butterknife.BindView",
+                    "androidx.databinding.Bindable",
+                    "androidx.databinding.BindingAdapter",
+                    "androidx.databinding.BindingBuildInfo",
+                    "androidx.databinding.BindingConversion",
+                    "androidx.databinding.BindingMethod",
+                    "androidx.databinding.BindingMethods",
+                    "androidx.databinding.InverseBindingAdapter",
+                    "androidx.databinding.InverseBindingMethod",
+                    "androidx.databinding.InverseBindingMethods",
+                    "androidx.databinding.InverseMethod",
+                    "androidx.databinding.Untaggable",
+                    "android.databinding.Bindable",
+                    "android.databinding.BindingAdapter",
+                    "android.databinding.BindingBuildInfo",
+                    "android.databinding.BindingConversion",
+                    "android.databinding.BindingMethod",
+                    "android.databinding.BindingMethods",
+                    "android.databinding.InverseBindingAdapter",
+                    "android.databinding.InverseBindingMethod",
+                    "android.databinding.InverseBindingMethods",
+                    "android.databinding.InverseMethod",
+                    "android.databinding.Untaggable"
+            };
 
 //            String annotation = "com.alibaba.android.arouter.facade.annotation.Route";
             ProcessorMapping processorMapping = new ProcessorMapping();
