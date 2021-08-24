@@ -17,9 +17,7 @@
 package com.immomo.wink.helper;
 
 import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
-import com.android.build.gradle.api.AnnotationProcessorOptions;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
@@ -50,10 +48,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+
 
 public class InitEnvHelper {
     Project project;
@@ -287,6 +285,8 @@ public class InitEnvHelper {
         initProjectData(fixedInfo, project, false);
     }
 
+    String kaptTaskCompileClasspath = "";
+
     private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project, boolean foreInit) {
         long findModuleEndTime = System.currentTimeMillis();
         fixedInfo.name = project.getName();
@@ -435,10 +435,19 @@ public class InitEnvHelper {
 
 
         Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
-        Settings.env.kaptCompileClasspath = kaptTaskParam.compileClassPath + ":"
-                + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes"
-                + ":" + Settings.env.tmpPath + "/tmp_class"
-                + ":" + project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r";
+        if (!kaptTaskCompileClasspath.equals(kaptTaskParam.compileClassPath)) {
+            Settings.env.kaptCompileClasspath = kaptTaskParam.compileClassPath + ":" + Settings.env.tmpPath + "/tmp_class";
+            kaptTaskCompileClasspath = kaptTaskParam.compileClassPath;
+        }
+        String debugClass = ":" + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes";
+        String debugR = ":" + project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r";
+        if (!Settings.env.kaptCompileClasspath.contains(debugClass)) {
+            Settings.env.kaptCompileClasspath += debugClass;
+        }
+        if (!Settings.env.kaptCompileClasspath.contains(debugR)) {
+            Settings.env.kaptCompileClasspath += debugR;
+        }
+
 
         Settings.env.jvmTarget = "-jvm-target " + getSupportVersion(javaCompile.getTargetCompatibility());
         kotlinArgs.add("-jvm-target");

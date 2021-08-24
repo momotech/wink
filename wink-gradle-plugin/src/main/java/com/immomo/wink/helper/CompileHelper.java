@@ -30,7 +30,7 @@ public class CompileHelper {
         //TODO-YZH 变更注解的文件列表
         List<String> changedAnnotationList = getChangedAnnotationList();
         if (changedAnnotationList.size() > 0){
-            changedAnnotationList.add("/Users/momo/winkDev/wink-gradle-plugin/src/main/java/com/immomo/wink/KaptCompileFile.kt");
+            changedAnnotationList.add("../KaptCompileFile.kt");
         }
         WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
 
@@ -157,13 +157,6 @@ public class CompileHelper {
                     + Settings.env.jvmTarget + " \\\n"
                     + "-d " + Settings.env.tmpPath + "/tmp_class" + changedAnnotationSb.toString();
 
-
-            WinkLog.d("wangzihang1", shellCommand);
-//            WinkLog.d("wangzihang2", Settings.env.javaHome);
-//            WinkLog.d("wangzihang5", Settings.env.kaptCompileClasspath);
-//            WinkLog.d("wangzihang4", processingClassPath.toString());
-//            WinkLog.d("wangzihang5", getKotlinAnnotationProcessing());
-//            WinkLog.d("wangzihang6", getKaptParams(KaptEncodeUtils.encodeList(map)));
 
             Utils.ShellResult result = Utils.runShells(shellCommand);
         } catch (Exception e) {
