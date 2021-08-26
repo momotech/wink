@@ -17,7 +17,9 @@
 package com.immomo.wink.helper;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.api.AnnotationProcessorOptions;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -132,7 +135,6 @@ public class InitEnvHelper {
         WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
         env.options = options.copy();
 
-        // todo apt
         initKaptTaskParams(env);
 
         findModuleTree2(project, "");
@@ -253,29 +255,34 @@ public class InitEnvHelper {
 
     private void initKaptTaskParams(Settings.Env env) {
         Settings.KaptTaskParam param = new Settings.KaptTaskParam();
-        Task kaptDebug = project.getTasks().getByName("kaptDebugKotlin");
-        if (kaptDebug instanceof KaptWithoutKotlincTask) {
-            KaptWithoutKotlincTask ktask = (KaptWithoutKotlincTask) kaptDebug;
-            param.compileClassPath = ktask.getClasspath().getAsPath();
-            param.javacOptions = ktask.getJavacOptions();
-            param.javaSourceRoots = null;
-            WinkLog.d("kapt!!! --- ktask.getClasspath().getAsPath() ===>>> " + ktask.getClasspath().getAsPath());
-            WinkLog.d("kapt!!! --- ktask.getJavacOptions() ===>>> " + ktask.getJavacOptions());
-//            param.processorOptions = ktask.processorOptions.getArguments();
-            try {
-                Field processorOptions = ShareReflectUtil.findField(ktask, "processorOptions");
-                CompilerPluginOptions options = (CompilerPluginOptions) processorOptions.get(ktask);
-                param.processorOptions = options.getArguments();
+        try {
 
-                Field configurationContainer = ShareReflectUtil.findField(((DefaultProject) project), "configurationContainer");
-                ConfigurationContainer conf = (ConfigurationContainer) configurationContainer.get(((DefaultProject) project));
-                if (conf != null) {
-                    param.processingClassPath = conf.getByName("kapt").resolve();
-                    WinkLog.d("kapt!!! --- processingClassPath ===>>> " + param.processingClassPath);
+            Task kaptDebug = project.getTasks().getByName("kaptDebugKotlin");
+            if (kaptDebug instanceof KaptWithoutKotlincTask) {
+                KaptWithoutKotlincTask ktask = (KaptWithoutKotlincTask) kaptDebug;
+                param.compileClassPath = ktask.getClasspath().getAsPath();
+                param.javacOptions = ktask.getJavacOptions();
+                param.javaSourceRoots = null;
+                WinkLog.d("kapt!!! --- ktask.getClasspath().getAsPath() ===>>> " + ktask.getClasspath().getAsPath());
+                WinkLog.d("kapt!!! --- ktask.getJavacOptions() ===>>> " + ktask.getJavacOptions());
+//            param.processorOptions = ktask.processorOptions.getArguments();
+                try {
+                    Field processorOptions = ShareReflectUtil.findField(ktask, "processorOptions");
+                    CompilerPluginOptions options = (CompilerPluginOptions) processorOptions.get(ktask);
+                    param.processorOptions = options.getArguments();
+
+                    Field configurationContainer = ShareReflectUtil.findField(((DefaultProject) project), "configurationContainer");
+                    ConfigurationContainer conf = (ConfigurationContainer) configurationContainer.get(((DefaultProject) project));
+                    if (conf != null) {
+                        param.processingClassPath = conf.getByName("kapt").resolve();
+                        WinkLog.d("kapt!!! --- processingClassPath ===>>> " + param.processingClassPath);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         env.kaptTaskParam = param;
@@ -285,7 +292,8 @@ public class InitEnvHelper {
         initProjectData(fixedInfo, project, false);
     }
 
-    String kaptTaskCompileClasspath = "";
+    Set<String> compilePath = new HashSet<>();
+    Set<String> processingPath = new HashSet<>();
 
     private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project, boolean foreInit) {
         long findModuleEndTime = System.currentTimeMillis();
@@ -356,7 +364,6 @@ public class InitEnvHelper {
 
 //            args.add("-sourcepath");
 //            args.add("");
-
         StringBuilder processorpath = new StringBuilder(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
         // todo apt
         if (Settings.env.kaptTaskParam != null &&
@@ -379,14 +386,17 @@ public class InitEnvHelper {
 //        }
 
         //注解处理器参数
-//        if (extension instanceof BaseExtension) {
+        if (extension instanceof BaseExtension) {
 //            StringBuilder aptOptions = new StringBuilder();
-//            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+            annotationProcessorOptions.getArguments().forEach((k,v) ->Settings.env.annotationProcessorOptions.put(k,v));
 //            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ", k, v)));
+        }
 //
 //            // todo apt
 //            // add kapt args
 //            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
+//                StringBuilder aptOptions = new StringBuilder();
 //                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
 //            }
 //
@@ -433,20 +443,21 @@ public class InitEnvHelper {
 //            kotlinArgs.add(processorArgs);
 //        }
 
-
         Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
-        if (!kaptTaskCompileClasspath.equals(kaptTaskParam.compileClassPath)) {
-            Settings.env.kaptCompileClasspath = kaptTaskParam.compileClassPath + ":" + Settings.env.tmpPath + "/tmp_class";
-            kaptTaskCompileClasspath = kaptTaskParam.compileClassPath;
+        addJavaCompilePath(javaCompile);
+        addKaptCompilePath(kaptTaskParam);
+        StringBuilder compilePathSb = new StringBuilder();
+        for (String s : compilePath) {
+            compilePathSb.append(":");
+            compilePathSb.append(s);
         }
-        String debugClass = ":" + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes";
-        String debugR = ":" + project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r";
-        if (!Settings.env.kaptCompileClasspath.contains(debugClass)) {
-            Settings.env.kaptCompileClasspath += debugClass;
+        Settings.env.kaptCompileClasspath = compilePathSb.toString().replaceFirst(":", "");
+        StringBuilder apSb = new StringBuilder();
+        for (String s : processingPath) {
+            apSb.append(":");
+            apSb.append(s);
         }
-        if (!Settings.env.kaptCompileClasspath.contains(debugR)) {
-            Settings.env.kaptCompileClasspath += debugR;
-        }
+        Settings.env.kaptProcessingClasspath = apSb.toString().replaceFirst(":", "");
 
 
         Settings.env.jvmTarget = "-jvm-target " + getSupportVersion(javaCompile.getTargetCompatibility());
@@ -460,9 +471,60 @@ public class InitEnvHelper {
         for (int i = 0; i < kotlinArgs.size(); i++) {
             sbKotlin.append(" ");
             sbKotlin.append(kotlinArgs.get(i));
+
         }
 
         fixedInfo.kotlincArgs = sbKotlin.toString();
+    }
+
+    private void addKaptCompilePath(Settings.KaptTaskParam kaptTaskParam) {
+        if (kaptTaskParam.compileClassPath != null) {
+            String[] kaptCompilePaths = kaptTaskParam.compileClassPath.split(":");
+            for (String kaptCompilePath : kaptCompilePaths) {
+                compilePath.add(kaptCompilePath);
+            }
+        }
+
+        if (kaptTaskParam.processingClassPath != null) {
+            for (File path : kaptTaskParam.processingClassPath) {
+                if (path.getAbsolutePath().contains("org.projectlombok")
+                        || path.getAbsolutePath().contains("wink-compiler-hook-lib")
+                        || path.getAbsolutePath().contains("butterknife-compiler")) {
+                    continue;
+                }
+                processingPath.add(path.getAbsolutePath());
+            }
+        }
+    }
+
+    private void addJavaCompilePath(JavaCompile javaCompile) {
+        Set<File> javaCompileFiles = javaCompile.getClasspath().getFiles();
+        Set<File> apfiles = javaCompile.getOptions().getAnnotationProcessorPath().getFiles();
+        for (File javaCompileFile : javaCompileFiles) {
+            if (javaCompileFile.getAbsolutePath().contains("org.projectlombok")
+                    || javaCompileFile.getAbsolutePath().contains("wink-compiler-hook-lib")
+                    || javaCompileFile.getAbsolutePath().contains("butterknife-compiler")) {
+                continue;
+            }
+            compilePath.add(javaCompileFile.getAbsolutePath());
+        }
+        Set<File> bootstrapPaths = javaCompile.getOptions().getBootstrapClasspath().getFiles();
+        for (File bootstrapPath : bootstrapPaths) {
+            compilePath.add(bootstrapPath.getAbsolutePath());
+        }
+
+        compilePath.add(project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes");
+        compilePath.add(Settings.env.tmpPath + "/tmp_class");
+        compilePath.add(project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r");
+
+        for (File processingFile : apfiles) {
+            if (processingFile.getAbsolutePath().contains("org.projectlombok")
+                    || processingFile.getAbsolutePath().contains("wink-compiler-hook-lib")
+                    || processingFile.getAbsolutePath().contains("butterknife-compiler")) {
+                continue;
+            }
+            processingPath.add(processingFile.getAbsolutePath());
+        }
     }
 
     private String getProcessorArgs(Map<String, String> argsA) {

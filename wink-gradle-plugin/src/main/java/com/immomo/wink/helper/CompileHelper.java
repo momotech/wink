@@ -1,17 +1,15 @@
 package com.immomo.wink.helper;
 
 
+import com.android.build.gradle.BaseExtension;
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
 import com.immomo.wink.util.KaptEncodeUtils;
 import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,19 +25,15 @@ public class CompileHelper {
             file.mkdirs();
         }
 
-        //TODO-YZH 变更注解的文件列表
+        //变更注解的文件列表
         List<String> changedAnnotationList = getChangedAnnotationList();
-        if (changedAnnotationList.size() > 0){
-            changedAnnotationList.add("../KaptCompileFile.kt");
-        }
 //        List<String> changedAnnotationList = new ArrayList<>();
-//        changedAnnotationList.add("/Users/momo/Desktop/ActivityMain4Binding.java");
-//        changedAnnotationList.add("/Users/momo/Documents/MomoProject/wink/wink-demo-app/src/main/java/com/immomo/wink/Test111.kt");
-//        changedAnnotationList.add("/Users/momo/Documents/MomoProject/wink/wink-demo-app/src/main/java/com/immomo/wink/Cartoon.kt");
+        if (changedAnnotationList.size() > 0) {
+            changedAnnotationList.add(Settings.env.tmpPath + "/wink-patch-lib/src/main/java/com/immomo/wink/patch/KaptCompileFile.kt");
+        }
         WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
 
 
-        // TODO: 8/17/21
         compileKapt(changedAnnotationList);
 
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
@@ -104,7 +98,7 @@ public class CompileHelper {
 
         String shellCommand = "javac" + project.fixedInfo.javacArgs
                 + sb.toString();
-        WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
+//        WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
         WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
         Utils.runShells(
                 shellCommand
@@ -115,7 +109,6 @@ public class CompileHelper {
         return project.changedJavaFiles.size();
     }
 
-    // TODO: 8/17/21
     private void compileKapt(List<String> changedAnnotationList) {
         if (changedAnnotationList.size() <= 0) {
             WinkLog.d("LiteBuild: ================> 没有 annotation 文件变更。");
@@ -126,23 +119,18 @@ public class CompileHelper {
             String javaHomePath = Settings.env.javaHome;
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
-            StringBuilder processingClassPath = new StringBuilder();
-            for (File path : kaptTaskParam.processingClassPath) {
-                if (path.getAbsolutePath().contains("org.projectlombok")
-                        || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-                        || path.getAbsolutePath().contains("butterknife-compiler")
-                ) {
-                    continue;
-                }
-                processingClassPath.append(":");
-                processingClassPath.append(path.getAbsolutePath());
-            }
 
             Map<String, String> apoptionsMap = new HashMap<>();
-            for (String processorOption : kaptTaskParam.processorOptions) {
-                String[] split = processorOption.split(":");
-                String[] split1 = split[split.length - 1].split("=");
-                apoptionsMap.put(split1[0], split1[1]);
+            if (kaptTaskParam.processorOptions != null) {
+                for (String processorOption : kaptTaskParam.processorOptions) {
+                    String[] split = processorOption.split(":");
+                    String[] split1 = split[split.length - 1].split("=");
+                    apoptionsMap.put(split1[0], split1[1]);
+                }
+            }
+
+            if (Settings.env.annotationProcessorOptions != null) {
+                Settings.env.annotationProcessorOptions.forEach((k, v) -> apoptionsMap.put(k, v));
             }
 
             StringBuilder changedAnnotationSb = new StringBuilder();
@@ -150,18 +138,15 @@ public class CompileHelper {
                 changedAnnotationSb.append(" ");
                 changedAnnotationSb.append(s);
             }
-
             String shellCommand = "sh " + kotlinc + " \\\n"
                     + "-verbose \\\n"
                     + "-jdk-home " + javaHomePath + " \\\n"
-                    + "-classpath " + Settings.env.kaptCompileClasspath + processingClassPath + " \\\n"
-                    + getKapt3Params(KaptEncodeUtils.encodeList(apoptionsMap)) + getApClasspath(kaptTaskParam.processingClassPath)
+                    + "-classpath " + Settings.env.kaptCompileClasspath + ":" + Settings.env.kaptProcessingClasspath + " \\\n"
+                    + getKapt3Params(KaptEncodeUtils.encodeList(apoptionsMap)) + getApClasspath(Settings.env.kaptProcessingClasspath)
                     + getKotlinAnnotationProcessing()
                     + getJdkToolsPath()
                     + Settings.env.jvmTarget + " \\\n"
                     + "-d " + Settings.env.tmpPath + "/tmp_class" + changedAnnotationSb.toString();
-
-
             Utils.ShellResult result = Utils.runShells(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,20 +155,14 @@ public class CompileHelper {
         Settings.data.classChangedCount += 1;
     }
 
-    private String getApClasspath(Set<? extends File> processingClassPath) {
+    private String getApClasspath(String processingClassPath) {
         StringBuilder sb = new StringBuilder();
-        for (File path : processingClassPath) {
-            if (path.getAbsolutePath().contains("org.projectlombok")
-                    || path.getAbsolutePath().contains("wink-compiler-hook-lib")
-                    || path.getAbsolutePath().contains("butterknife-compiler")
-            ) {
-                continue;
-            }
+        String[] processingPath = processingClassPath.split(":");
+        for (String s : processingPath) {
             sb.append("-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=");
-            sb.append(path.getAbsolutePath());
+            sb.append(s);
             sb.append(" \\\n");
         }
-
         return sb.toString();
     }
 
@@ -265,7 +244,7 @@ public class CompileHelper {
             kotlinc = "/Applications/AndroidStudio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
         }
 
-        if (kotlinc == null || kotlinc.equals("") ||!new File(kotlinc).exists()) {
+        if (kotlinc == null || kotlinc.equals("") || !new File(kotlinc).exists()) {
             WinkLog.throwAssert("\n\n================== 请配置 KOTLINC_HOME =================="
                     + "\n1. 打开：~/.bash_profile"
                     + "\n2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\""
@@ -326,7 +305,7 @@ public class CompileHelper {
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "rm -rf " + dest;
         cmds += '\n' + "cd " + Settings.env.tmpPath + "/tmp_class";
-        cmds += '\n' + "zip -r -o -q " + dest +  " *";
+        cmds += '\n' + "zip -r -o -q " + dest + " *";
         cmds += '\n' + Settings.env.buildToolsDir + "/d8 --intermediate --output " + Settings.env.tmpPath + "/" + patchName
                 + " " + Settings.env.tmpPath + "/tmp_class.zip";
 
@@ -346,7 +325,7 @@ public class CompileHelper {
 //        WinkLog.v("Dex生成命令cmd =======\n" + cmds);
         String cmds = "";
         cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
-                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
+                + Settings.env.tmpPath + "/" + patchName + " " + Settings.env.tmpPath + "/tmp_class/";
 
         cmds += '\n' + "adb shell mkdir " + destPath;
         cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;

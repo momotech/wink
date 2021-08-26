@@ -15,12 +15,15 @@
  */
 package com.immomo.wink
 
+import com.android.build.gradle.api.AnnotationProcessorOptions
 import com.immomo.wink.compiler.ProcessorMapping
 import com.immomo.wink.util.LocalCacheUtil
 import com.immomo.wink.util.WinkLog
 import java.io.File
 import java.io.Serializable
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 object Settings {
     @JvmField
@@ -58,34 +61,36 @@ object Settings {
         data.beginTime = System.currentTimeMillis()
         // todo apt
         data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
-        WinkLog.d("data.processorMapping ::::::::::::::::::: " + data.processorMapping)
+//        WinkLog.d("data.processorMapping ::::::::::::::::::: " + data.processorMapping)
 
         return data
     }
 
     data class Env(
-            @JvmField var javaHome: String? = null,
-            @JvmField var rootDir: String? = null,
-            @JvmField var version: String? = null,
-            @JvmField var sdkDir: String? = null,
-            @JvmField var buildToolsVersion: String? = null,
-            @JvmField var buildToolsDir: String? = null,
-            @JvmField var compileSdkVersion: String? = null,
-            @JvmField var compileSdkDir: String? = null,
-            @JvmField var debugPackageName: String? = null,
-            @JvmField var launcherActivity: String? = null,
-            @JvmField var appProjectDir: String? = null,
-            @JvmField var tmpPath: String = "",
-            @JvmField var packageName: String? = null,
-            @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
-            @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
-            @JvmField var options: WinkOptions? = null,
-            @JvmField var defaultFlavor: String = "",
-            @JvmField var variantName: String = "debug",
-            @JvmField var kaptTaskParam: KaptTaskParam? = null,
-            @JvmField var kaptCompileClasspath: String? = null,
-            @JvmField var jvmTarget: String? = null,
-            @JvmField var branch: String = "debug",
+        @JvmField var javaHome: String? = null,
+        @JvmField var rootDir: String? = null,
+        @JvmField var version: String? = null,
+        @JvmField var sdkDir: String? = null,
+        @JvmField var buildToolsVersion: String? = null,
+        @JvmField var buildToolsDir: String? = null,
+        @JvmField var compileSdkVersion: String? = null,
+        @JvmField var compileSdkDir: String? = null,
+        @JvmField var debugPackageName: String? = null,
+        @JvmField var launcherActivity: String? = null,
+        @JvmField var appProjectDir: String? = null,
+        @JvmField var tmpPath: String = "",
+        @JvmField var packageName: String? = null,
+        @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
+        @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
+        @JvmField var options: WinkOptions? = null,
+        @JvmField var defaultFlavor: String = "",
+        @JvmField var variantName: String = "debug",
+        @JvmField var kaptTaskParam: KaptTaskParam? = null,
+        @JvmField var kaptCompileClasspath: String? = null,
+        @JvmField var kaptProcessingClasspath: String? = null,
+        @JvmField var annotationProcessorOptions: Map<String,String>? = HashMap<String,String>(),
+        @JvmField var jvmTarget: String? = null,
+        @JvmField var branch: String = "debug",
     ) : Serializable
 
     data class Data(
