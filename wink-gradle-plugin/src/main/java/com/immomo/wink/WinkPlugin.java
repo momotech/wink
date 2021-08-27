@@ -85,7 +85,7 @@ public class WinkPlugin implements Plugin<Project> {
 
         if (!project.getGroup().equals("wink")) {
             project.getDependencies().add("debugImplementation",
-                    project.getDependencies().create("com.immomo.wink:patch-lib:0.2.0i"));
+                    project.getDependencies().create("com.immomo.wink:patch-lib:0.3.16"));
         }
     }
 
