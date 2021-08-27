@@ -25,3 +25,4 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.5'
     implementation 'org.apache.commons:commons-collections4:4.1'
 }
+//apply from: '../wink-compiler-hook-lib/upload_compiler_hook.gradle'
