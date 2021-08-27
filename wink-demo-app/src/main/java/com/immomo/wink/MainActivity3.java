@@ -21,8 +21,8 @@ public class MainActivity3 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
-        Log.e("Test","123");
-        Toast.makeText(this, "Activity3333 ===", Toast.LENGTH_SHORT).show();
+        Log.e("Test","121231113");
+        Toast.makeText(this, "Activity331233 ===", Toast.LENGTH_SHORT).show();
 
         findViewById(R.id.button).setOnClickListener(v -> {
             //打开注释验证 EventBus

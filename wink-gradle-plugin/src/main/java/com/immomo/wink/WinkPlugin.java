@@ -34,6 +34,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -163,7 +164,35 @@ public class WinkPlugin implements Plugin<Project> {
 
         cacheApkFile(project);
 
+        createKotlinFile(project);
+
         pushVersionFileToDevice(project);
+    }
+
+    // 创建 Kotlin 文件，用来 kapt 编译
+    private void createKotlinFile(Project project) {
+        String fileName = project.getRootDir() + "/.idea/" + Settings.NAME + "/KaptCompileFile.kt";
+        String fileContent =
+            "package com.immomo.wink.patch\n" +
+            "class KaptCompileFile {\n" +
+            "}";
+
+        byte[] sourceByte = fileContent.getBytes();
+        if (null != sourceByte) {
+            try {
+                File file = new File(fileName);        //文件路径（路径+文件名）
+                if (!file.exists()) {    //文件不存在则创建文件，先创建目录
+                    File dir = new File(file.getParent());
+                    dir.mkdirs();
+                    file.createNewFile();
+                }
+                FileOutputStream outStream = new FileOutputStream(file);    //文件输出流用于将数据写入文件
+                outStream.write(sourceByte);
+                outStream.close();    //关闭文件输出流
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // 推送本次打包 Version.png 到设备

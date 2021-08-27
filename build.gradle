@@ -70,6 +70,7 @@ buildscript {
 //        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
+//        classpath 'com.immomo.wink:plugin:0.3.16'
     }
 }
 

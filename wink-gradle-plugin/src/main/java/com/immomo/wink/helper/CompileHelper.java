@@ -28,8 +28,9 @@ public class CompileHelper {
         //变更注解的文件列表
         List<String> changedAnnotationList = getChangedAnnotationList();
 //        List<String> changedAnnotationList = new ArrayList<>();
+//        changedAnnotationList.add("/Users/momo/Documents/MomoProject/wink/wink-demo-app/src/main/java/com/immomo/wink/MainActivity3.java");
         if (changedAnnotationList.size() > 0) {
-            changedAnnotationList.add(Settings.env.tmpPath + "/wink-patch-lib/src/main/java/com/immomo/wink/patch/KaptCompileFile.kt");
+            changedAnnotationList.add(Settings.env.tmpPath + "/KaptCompileFile.kt");
         }
         WinkLog.d("changedAnnotationList >>>>>>>>>>>>>>>>>>> : " + changedAnnotationList.toString());
 
