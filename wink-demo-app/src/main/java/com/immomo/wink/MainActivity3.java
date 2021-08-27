@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-@Route(path = "/com/Activity333")
+@Route(path = "/com/Activity33")
 public class MainActivity3 extends AppCompatActivity {
 
     //打开注释验证 EventBus
@@ -21,7 +21,7 @@ public class MainActivity3 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
-        Log.e("Test","121231113");
+        Log.e("Test","12123111113");
         Toast.makeText(this, "Activity331233 ===", Toast.LENGTH_SHORT).show();
 
         findViewById(R.id.button).setOnClickListener(v -> {

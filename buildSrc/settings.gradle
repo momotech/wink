@@ -1,2 +1,2 @@
-includeFlat 'wink-gradle-plugin'
-include ':wink-gradle-plugin'
+//includeFlat 'wink-gradle-plugin'
+//include ':wink-gradle-plugin'

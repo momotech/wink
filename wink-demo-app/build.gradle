@@ -54,11 +54,12 @@ kapt {
 dependencies {
     implementation 'org.greenrobot:eventbus:3.2.0'
     kapt "org.greenrobot:eventbus-annotation-processor:3.2.0"
-    implementation project(':wink-patch-lib')
+//    kapt project(':wink-compiler-hook-lib')
+//    implementation project(':wink-patch-lib')
+    kapt "com.immomo.wink:compiler-hook:0.3.22"
     implementation project(':wink-demo-lib')
     implementation 'com.jakewharton:butterknife:10.2.3'
     kapt 'com.jakewharton:butterknife-compiler:10.2.3'
-    kapt project(':wink-compiler-hook-lib')
 //    implementation project(':wink-compiler-hook-lib')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.alibaba:arouter-api:1.2.1.1'
@@ -71,5 +72,5 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-//    implementation 'com.immomo.wink:plugin:0.3.16'
+//    implementation 'com.immomo.wink:plugin:0.3.22'
 }
