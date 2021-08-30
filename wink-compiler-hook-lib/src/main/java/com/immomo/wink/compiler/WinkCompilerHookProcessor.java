@@ -1,13 +1,16 @@
 package com.immomo.wink.compiler;
 
 import com.google.auto.service.AutoService;
-import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Symbol;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -21,15 +24,15 @@ import javax.lang.model.element.TypeElement;
 @SupportedAnnotationTypes({"*"})
 public class WinkCompilerHookProcessor extends AbstractProcessor {
 
-    private Trees trees;
+//    private Trees trees;
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        System.out.println("=======================");
-        System.out.println("   process run !!!   ");
-        System.out.println("=======================");
-
-        System.out.println("TypeElement ===>>> : " + set.toString());
+//        System.out.println("=======================");
+//        System.out.println("   process run !!!   ");
+//        System.out.println("=======================");
+//
+//        System.out.println("TypeElement ===>>> : " + set.toString());
 
         /*
             出错情况：直接执行脚本
@@ -52,12 +55,12 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
         // https://youtrack.jetbrains.com/issue/KT-24540
         // https://github.com/JetBrains/kotlin/pull/1772 [Kapt] Pass current ClassLoader as parent class loader by default
         // java.lang.AssertionError: java.lang.ClassCastException: com.sun.tools.javac.api.JavacTrees cannot be cast to com.sun.source.util.Trees
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ getClass().getClassLoader(): "
-                + getClass().getClassLoader().toString());
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ Trees.class.getClassLoader(): "
-                + Trees.class.getClassLoader().toString());
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ processingEnv.getClass().getClassLoader() 111: "
-                + processingEnv.getClass().getClassLoader().toString());
+//        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ getClass().getClassLoader(): "
+//                + getClass().getClassLoader().toString());
+//        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ Trees.class.getClassLoader(): "
+//                + Trees.class.getClassLoader().toString());
+//        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~ processingEnv.getClass().getClassLoader() 111: "
+//                + processingEnv.getClass().getClassLoader().toString());
 
         // 此处模拟 ButterKnife 注解处理器出现异常时情况
         /*
@@ -85,54 +88,40 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
         */
 
         try {
-//            File file = new File("../.idea/wink/annotation/whitelist");
-//            if (!file.exists()) {
-//                return false;
-//            }
-//
-//            String annotationWhiteListStr = null;
-//            try {
-//                BufferedReader input = new BufferedReader(new FileReader(file));
-//                annotationWhiteListStr = input.readLine();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            if (annotationWhiteListStr == null
-//                    || annotationWhiteListStr.isEmpty()) {
-//                return false;
-//            }
-//
-//            String[] whiteList = annotationWhiteListStr.split(",");
+            File file = new File(".idea/wink_annotation_whitelist.txt");
+            System.out.println("file.getAbsolutePath() : " + file.getAbsolutePath());
+            if (!file.exists()) {
+                Log.i("wink_annotation_whitelist.txt file not exist");
+                return false;
+            }
 
-//            set.iterator().next().getQualifiedName()
+            List<String> whiteList = new ArrayList<>();
+            //BufferedReader是可以按行读取文件
+            FileInputStream inputStream = new FileInputStream(".idea/wink_annotation_whitelist.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-            String[] whiteList = new String[]{
-                    "com.alibaba.android.arouter.facade.annotation.Route",
-                    "butterknife.BindView",
-                    "androidx.databinding.Bindable",
-                    "androidx.databinding.BindingAdapter",
-                    "androidx.databinding.BindingBuildInfo",
-                    "androidx.databinding.BindingConversion",
-                    "androidx.databinding.BindingMethod",
-                    "androidx.databinding.BindingMethods",
-                    "androidx.databinding.InverseBindingAdapter",
-                    "androidx.databinding.InverseBindingMethod",
-                    "androidx.databinding.InverseBindingMethods",
-                    "androidx.databinding.InverseMethod",
-                    "androidx.databinding.Untaggable",
-                    "android.databinding.Bindable",
-                    "android.databinding.BindingAdapter",
-                    "android.databinding.BindingBuildInfo",
-                    "android.databinding.BindingConversion",
-                    "android.databinding.BindingMethod",
-                    "android.databinding.BindingMethods",
-                    "android.databinding.InverseBindingAdapter",
-                    "android.databinding.InverseBindingMethod",
-                    "android.databinding.InverseBindingMethods",
-                    "android.databinding.InverseMethod",
-                    "android.databinding.Untaggable"
-            };
+            String str = null;
+            while((str = bufferedReader.readLine()) != null)
+            {
+                whiteList.add(str);
+//                System.out.println(str);
+            }
+
+            //close
+            inputStream.close();
+            bufferedReader.close();
+
+            if (whiteList.size() == 0) {
+                Log.i("===>>> wink_annotation_whitelist.txt is empty");
+                return false;
+            }
+
+            Log.i("===>>> wink annotation list : " + whiteList.toString());
+
+//            String[] whiteList = new String[]{
+//                    "com.alibaba.android.arouter.facade.annotation.Route",
+//                    "butterknife.BindView"
+//            };
 
 //            String annotation = "com.alibaba.android.arouter.facade.annotation.Route";
             ProcessorMapping processorMapping = new ProcessorMapping();

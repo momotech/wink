@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//include ':wink-compiler-hook-lib'
+include ':wink-compiler-hook-lib'
 //include ':wink-patch-lib'
 include ':wink-demo-lib'
 include ':wink-demo-app'
