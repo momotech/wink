@@ -8,6 +8,7 @@ import com.immomo.wink.util.KaptEncodeUtils;
 import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+
+import kotlin.io.CloseableKt;
+import kotlin.io.FilesKt;
+import kotlin.text.StringsKt;
 
 public class CompileHelper {
 
@@ -139,6 +145,7 @@ public class CompileHelper {
                 changedAnnotationSb.append(" ");
                 changedAnnotationSb.append(s);
             }
+
             String shellCommand = "sh " + kotlinc + " \\\n"
                     + "-verbose \\\n"
                     + "-jdk-home " + javaHomePath + " \\\n"
@@ -156,13 +163,47 @@ public class CompileHelper {
         Settings.data.classChangedCount += 1;
     }
 
+
+    private boolean hasAnnotationProcessors(File file) {
+        String processorEntryPath = "META-INF/services/javax.annotation.processing.Processor";
+
+        try {
+//                file.isDirectory -> {
+//                    return file.resolve(processorEntryPath).exists()
+//                }
+            if (file.isDirectory()) {
+                File test = new File(file.getAbsolutePath() + File.separator + processorEntryPath);
+                return test.exists();
+            }
+
+//                file.isFile && file.extension.equals("jar", ignoreCase = true) -> {
+//                    return JarFile(file).use { jar ->
+//                            jar.getJarEntry(processorEntryPath) != null
+//                    }
+//                }
+            if (file.isFile() && file.getName().substring(file.getName().lastIndexOf(".")).equalsIgnoreCase(".jar")) {
+                return (new JarFile(file).getJarEntry(processorEntryPath)) != null;
+
+
+            }
+        } catch (Exception e) {
+            WinkLog.d("Could not check annotation processors existence in $file: $e");
+        }
+        return false;
+    }
+
     private String getApClasspath(String processingClassPath) {
+
+
         StringBuilder sb = new StringBuilder();
         String[] processingPath = processingClassPath.split(":");
         for (String s : processingPath) {
-            sb.append("-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=");
-            sb.append(s);
-            sb.append(" \\\n");
+            if (KaptEncodeUtils.hasAnnotationProcessors(new File(s))) {
+                sb.append("-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=");
+                sb.append(s);
+                sb.append(" \\\n");
+            }
+//            hasAnnotationProcessors(new File(s));
         }
         return sb.toString();
     }
