@@ -69,7 +69,8 @@ When the configuration is done, synchronize the project, you need to run the pro
 Just add winnk-compiler (reads annotations and file dependencies), currently annotationProcessor `depends on kotlin environment`.
 
 kapt dependencies:
-``groovy
+
+```groovy
 kapt "com.immomo.wink:compiler-hook:0.3.23"
 ```
 apt dependencies.
@@ -77,7 +78,7 @@ apt dependencies.
 annotationProcessor "com.immomo.wink:compiler-hook:0.3.23"
 ```
 
-For different annotations, you need to create ``wink_annotation_whitelist.txt`` in the ``.idea`` directory of the project
+For different annotations, you need to create `wink_annotation_whitelist.txt` in the `.idea` directory of the project
 file to identify the type of annotation to be processed (distinguished by `carriage return`, one annotation class per line)  
 <br/>
 
@@ -101,8 +102,8 @@ Click to execute
 
 ## Quick start method 2: Script execution
 ### First time Wink installation requires initialization
-Execute Task ``winkInitWithShell`''
-``groovy
+Execute Task `winkInitWithShell`
+```groovy
 . /gradlew winkInitWithShell
 ```
 
@@ -161,5 +162,3 @@ In no event shall the author or copyright holder be liable for any claims, damag
 liability, whether in contract, tort or otherwise, arising out of
 arising out of, or in connection with, the Software, or any claim, damage or other liability in connection with the use of, or other dealings with, the Software, neither the author nor the copyright holder shall be liable for any
 This software.
-
-```
