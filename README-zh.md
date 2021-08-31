@@ -36,39 +36,110 @@ Wink是AndroidStudio的一个快速构建插件。Wink的目标是建立一个�
     <img src="https://s.momocdn.com/s1/u/dcehhhadi/sh_console.png" width = "500"  alt="图片名称" align=center />
 
 
+### 配置插件
+在项目根路径的 `build.gradle` 中加入当前最新的插件地址和版本号如下：
 
-### 用Gradle安装
-1 . 在你的项目根目录下找到你的 build.gradle，并在依赖项块中添加一行 classpath 'com.immomo.litebuild:plugin:0.1.45' 
-
+```groovy
+classpath 'com.immomo.wink:plugin:0.3.23'
 ```
-   buildscript {
-    repositories {
-         mavenCentral()//use mavenCenter
-    }
-    dependencies {
-        classpath 'com.immomo.litebuild:plugin:0.1.45'
-    }
+
+在主工程 `app` 中的 `build.gradle` 应用该插件（只需在主 app 工程中应用插件即可，无需每个 module 都应用）:
+
+```groovy
+apply plugin: 'com.immomo.wink.plugin'
+```
+
+---
+
+##### 配置编译白名单（只编译白名单中变更的代码）
+配置需要检测变更的白名单目录，可以更最大程度提高编译速度（这里表示我们只关心 `hanisdk` 该 module 的文件变更，若有多个 module 则用逗号分隔）：
+
+```groovy
+winkOptions {
+    moduleWhitelist = [ "hanisdk" ]
+    logLevel = 4 // 日志等级；4为普通，0打开所有日志
 }
 ```
-2 .在你的主应用程序文件夹中找到build.gradle文件。插入行插件配置，如演示代码
+
+当配置完成后，同步项目，在执行 `wink` 之前需要先完整用 `AS->Run` 或者 `assembleDebug` 完整运行一遍项目，保证电脑端和手机端代码一致。  
+
+---
+
+#### ARouter & EventBus 注解支持（非必须，按需依赖）
+添加 winnk-compiler (读取注解与文件的依赖关系)即可，目前 annotationProcessor `依赖 kotlin 环境`
+
+kapt 依赖:
+```groovy
+kapt "com.immomo.wink:compiler-hook:0.3.23"
 ```
-plugins {
-    id 'com.android.application'
-    id 'com.immomo.litebuild.plugin'
-    id 'kotlin-android'
-}
+apt 依赖：
+```groovy
+annotationProcessor "com.immomo.wink:compiler-hook:0.3.23"
 ```
-或者这样
 
-    apply plugin: 'com.android.application'
-    apply plugin: 'com.immomo.litebuild.plugin'
+针对不同的注解，需要在项目的 `.idea` 目录下创建 `wink_annotation_whitelist.txt`
+文件来标识需要处理的注解类型（用`回车`区分，每行一个注解类）  
+<br/>
+
+例如：处理 ARouter 的 Route 注解 -> 从[类文件](https://github.com/alibaba/ARouter/blob/develop/arouter-annotation/src/main/java/com/alibaba/android/arouter/facade/annotation/Route.java) 中找到完整路径为`com.alibaba.android.arouter.facade.annotation.Route`  
+<br/>
+
+ARouter 和平台的 AppConfig 注解的 `wink_annotation_whitelist.txt` 文件内容如下
+```
+com.alibaba.android.arouter.facade.annotation.Route
+com.immomo.annotations.appconfig.appconfigv1.AppConfigV1
+```
+
+---  
 
 
-##通过Gradle或终端运行
-1. 安装插件后，你可以通过Wink按钮运行或通过gradle任务列表中的gradle任务litebuild运行
+## 快速启动方式一：Android Studio插件执行 「推荐，两种方式二选一」
+为了更方便的使用，可以直接用插件，拖进studio即可安装:
+https://s.momocdn.com/s1/u/geajgghjh/Wink-2.1.2.zip
+![image.png](/attach/60efe633bc61b.png)
+点击即可执行
 
-    <img src="https://s.momocdn.com/s1/u/dcehhhadi/gradle_task_lite_build.png" width = "330" height = "305" alt="图片名称" align=center />
+## 快速启动方式二：脚本执行
+### 首次安装Wink需初始化
+执行Task `winkInitWithShell`
+```groovy
+./gradlew winkInitWithShell
+```
 
+### 快速启动
+
+然后正常进行代码的修改，在Terminal中执行：
+
+```groovy
+./wink.sh
+```
+执行成功后会重启App变更生效！
+
+`PS：用脚本执行能规避Gradle初始化的耗时，在陌陌App中体现的效果是增量一次的耗时由10s降低到3s`
+
+### 更新日志
+
+#### 0.3.23
+- 支持配置指定注解
+
+#### 0.3.22
+- 支持编译 ARouter 注解
+- 支持同时连接多个设备运行
+
+
+#### 0.3.14i
+1. 支持raw格式资源文件
+
+
+#### 0.3.6
+1. 执行由Gradle Task变更为脚本，执行效率由10s降低到3s
+2. 由此而来整个执行体系变更，增加winkIni初始化流程
+
+#### 0.2.3i
+1. Litebuild重命名为Wink
+2. 梳理日志，增加了日志颜色更美观了
+3. 执行错误抛assert出来，不再错误的跑完全程
+4. fix 新增资源找不到id
 
 ## The MIT License (MIT)
 ```
