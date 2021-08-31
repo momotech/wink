@@ -82,7 +82,10 @@ For different annotations, you need to create `wink_annotation_whitelist.txt` in
 file to identify the type of annotation to be processed (distinguished by `carriage return`, one annotation class per line)  
 <br/>
 
-Example: Processing Route annotations for ARouter -> from [class file](https://github.com/alibaba/ARouter/blob/develop/arouter-annotation/src/main/java/com/alibaba/android/ arouter/facade/annotation/Route.java) with full path `com.alibaba.android.arouter.facade.annotation.Route`  
+Example: Processing Route annotations for ARouter -> from
+[class file](https://github.com/alibaba/ARouter/blob/develop/arouter-annotation/src/main/java/com/alibaba/android/arouter/facade/annotation/Route.java)
+
+with full path `com.alibaba.android.arouter.facade.annotation.Route`  
 <br/>
 
 The `wink_annotation_whitelist.txt` file for the AppConfig annotations for ARouter and the platform reads
