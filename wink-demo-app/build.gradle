@@ -54,7 +54,10 @@ kapt {
 dependencies {
     implementation 'org.greenrobot:eventbus:3.2.0'
     kapt "org.greenrobot:eventbus-annotation-processor:3.2.0"
-    kapt project(':wink-compiler-hook-lib')
+//    kapt(project(':wink-compiler-hook-lib'))
+
+    kapt project(path: ':wink-compiler-hook-lib', configuration: 'default')
+
 //    implementation project(':wink-patch-lib')
 //    kapt "com.immomo.wink:compiler-hook:0.3.22"
     implementation project(':wink-demo-lib')
