@@ -50,5 +50,15 @@ gradlePlugin {
     }
 }
 
+apply from: rootProject.file('../wink-publish/UploadProperties.gradle')
+// 配置生成 jar 包
+jar {
+    manifest {
+        attributes "Implementation-Title": project.name
+        attributes "Implementation-Version": gradle.winkVersion
+        attributes 'Main-Class': 'com.immomo.wink.JavaEntrance'//,
+    }
+}
+
 //apply from: '../wink-publish/upload_plugin.gradle'
 
