@@ -40,7 +40,7 @@ In Android development process, the build speed of the application directly affe
 Add the current latest plugin address and version number to `build.gradle` in the project root path as follows
 
 ```groovy
-classpath 'com.immomo.wink:plugin:0.3.23'
+classpath 'com.immomo.wink:plugin:0.3.27'
 ```
 
 Apply the plugin to `build.gradle` in the main project `app` (you only need to apply the plugin to the main app project, not to each module):
@@ -71,7 +71,12 @@ Just add winnk-compiler (reads annotations and file dependencies), currently ann
 kapt dependencies:
 
 ```groovy
-kapt "com.immomo.wink:compiler-hook:0.3.23"
+kapt "com.immomo.wink:compiler-hook:
+
+
+
+
+23"
 ```
 apt dependencies.
 ```groovy
