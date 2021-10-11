@@ -63,7 +63,7 @@ winkOptions {
 
 When the configuration is done, synchronize the project, you need to run the project completely with `AS->Run` or `assembleDebug` before executing `wink` to make sure the code on the computer side and mobile side is the same.  
 
---
+---
 
 #### ARouter & EventBus annotation support (not required, on-demand dependency)
 Just add winnk-compiler (reads annotations and file dependencies), currently annotationProcessor `depends on kotlin environment`.
@@ -71,12 +71,7 @@ Just add winnk-compiler (reads annotations and file dependencies), currently ann
 kapt dependencies:
 
 ```groovy
-kapt "com.immomo.wink:compiler-hook:
-
-
-
-
-23"
+kapt "com.immomo.wink:compiler-hook:0.3.23"
 ```
 apt dependencies.
 ```groovy
