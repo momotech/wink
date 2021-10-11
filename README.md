@@ -121,6 +121,14 @@ The successful execution will restart the App changes to take effect!
 
 PS: Execution by script can circumvent the time consuming Gradle initialization, the effect reflected in the Stranger App is that the time consuming of incrementing once is reduced from 10s to 3s`
 
+### ERROR
+
+Make sure `./gradlew installDebug` can run well, Otherwise `./gradlew wink` or `./wink.sh` task will throw an Exception.
+
+If the above happens. Try to set `JAVA_HONE` environment as same as AndroidStudio `JDK location` path.
+![WechatIMG2.png](http://tva1.sinaimg.cn/large/0020yNeuly1gv99jveyygj61au0pqqa702.jpg)
+
+
 ### Update log
 
 #### 0.3.23
