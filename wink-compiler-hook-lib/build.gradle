@@ -1,4 +1,13 @@
-apply plugin: 'java'
+plugins {
+    id 'java-library'
+//    id 'com.android.library' 打包时有问题可以临时使用
+
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
 
 ext {
     bintrayName = 'wink-compiler'
@@ -8,21 +17,22 @@ ext {
     libraryVersion = '1.0'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
-}
+//java {
+//    sourceCompatibility = JavaVersion.VERSION_1_7
+//    targetCompatibility = JavaVersion.VERSION_1_7
+//}
 
 dependencies {
     compileOnly files('libs/tools.jar')
+    compileOnly files('libs/rt.jar')
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
     implementation 'com.google.auto.service:auto-service-annotations:1.0-rc7'
 
     implementation 'com.squareup:javapoet:1.8.0'
 //    implementation 'com.squareup:javapoet:1.13.0'
-    implementation 'org.projectlombok:lombok:1.18.2'
+//    implementation 'org.projectlombok:lombok:1.18.2'
 
-    implementation 'org.apache.commons:commons-lang3:3.5'
-    implementation 'org.apache.commons:commons-collections4:4.1'
+//    implementation 'org.apache.commons:commons-lang3:3.5'
+//    implementation 'org.apache.commons:commons-collections4:4.1'
 }
-//apply from: '../wink-compiler-hook-lib/upload_compiler_hook.gradle'
+//apply from: '../wink-publish/upload_compiler_hook.gradle'
