@@ -1,12 +1,13 @@
 package com.immomo.wink.helper;
 
 
-import com.android.build.gradle.BaseExtension;
-import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
+import com.immomo.wink.WinkOptions;
 import com.immomo.wink.util.KaptEncodeUtils;
-import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
+import com.immomo.wink.util.WinkLog;
+
+import org.apache.http.util.TextUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public class CompileHelper {
 
@@ -45,6 +45,19 @@ public class CompileHelper {
             compileJava(project);
         }
 
+        if (changedAnnotationList.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < Settings.data.projectBuildSortList.size(); i++) {
+                if (TextUtils.isEmpty(Settings.data.projectBuildSortList.get(i).fixedInfo.classPath)) {
+                    continue;
+                }
+                sb.append(Settings.data.projectBuildSortList.get(i).fixedInfo.classPath);
+                if (i != Settings.data.projectBuildSortList.size() - 1) {
+                    sb.append(":");
+                }
+            }
+            compileKaptFile(sb.toString());
+        }
         createDexPatch();
     }
 
@@ -99,7 +112,7 @@ public class CompileHelper {
 
         String shellCommand = "javac" + project.fixedInfo.javacArgs
                 + sb.toString();
-//        WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
+        WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
         WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
         Utils.runShells(
                 shellCommand
@@ -108,6 +121,26 @@ public class CompileHelper {
         Settings.data.classChangedCount += 1;
 
         return project.changedJavaFiles.size();
+    }
+
+    //TODO-YWB: classpath 去重
+    private void compileKaptFile(String classPath) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ").append(Settings.env.tmpPath).append("/tmp_class/com/alibaba/android/arouter/routes/*.java");
+        WinkLog.d("[compileKaptFile]", sb.toString());
+        if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
+            for (String processorOption : Settings.env.kaptTaskParam.processorOptions) {
+                String[] split = processorOption.split(":");
+                String[] split1 = split[split.length - 1].split("=");
+                WinkLog.w("processorOption : " + split1[0] + " === " + split1[1]);
+                if ("eventBusIndex".equals(split1[0])) {
+                    sb.append(" ").append(Settings.env.tmpPath).append("/tmp_class/").append(split1[1].replace(".", "/")).append(".java");
+                }
+            }
+        }
+        String command = "javac -source 1.8 -target 1.8 -encoding UTF-8 -bootclasspath /Users/momo/Library/Android/sdk/platforms/android-30/android.jar:/Users/momo/Library/Android/sdk/build-tools/30.0.3/core-lambda-stubs.jar -g -classpath "
+                + classPath + " -d /Users/momo/Documents/MomoProject/wink/.idea/wink/tmp_class " + sb.toString();
+        Utils.runShells(command);
     }
 
     private void compileKapt(List<String> changedAnnotationList) {
@@ -122,7 +155,7 @@ public class CompileHelper {
             Settings.KaptTaskParam kaptTaskParam = Settings.env.kaptTaskParam;
 
             Map<String, String> apoptionsMap = new HashMap<>();
-            if (kaptTaskParam.processorOptions != null) {
+            if (kaptTaskParam != null && kaptTaskParam.processorOptions != null) {
                 for (String processorOption : kaptTaskParam.processorOptions) {
                     String[] split = processorOption.split(":");
                     String[] split1 = split[split.length - 1].split("=");
@@ -131,7 +164,7 @@ public class CompileHelper {
             }
 
             if (Settings.env.annotationProcessorOptions != null) {
-                Settings.env.annotationProcessorOptions.forEach((k, v) -> apoptionsMap.put(k, v));
+                Settings.env.annotationProcessorOptions.forEach(apoptionsMap::put);
             }
 
             StringBuilder changedAnnotationSb = new StringBuilder();
@@ -147,7 +180,7 @@ public class CompileHelper {
                     + getKotlinAnnotationProcessing()
                     + getJdkToolsPath()
                     + Settings.env.jvmTarget + " \\\n"
-                    + "-d " + Settings.env.tmpPath + "/tmp_class" + changedAnnotationSb.toString();
+                    + changedAnnotationSb.toString();
             Utils.ShellResult result = Utils.runShells(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,6 +190,9 @@ public class CompileHelper {
     }
 
     private String getApClasspath(String processingClassPath) {
+        if (TextUtils.isEmpty(processingClassPath)) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         String[] processingPath = processingClassPath.split(":");
         for (String s : processingPath) {
@@ -182,7 +218,7 @@ public class CompileHelper {
     private String getKapt3Params(String kaptEncodeOption) {
         return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/wink/tmp_class \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/wink/tmp_class \\\n" +
-                "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/wink/tmp_class \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/wink/tmp_kapt_stubs \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:apoptions=" + kaptEncodeOption + " \\\n";
@@ -226,7 +262,7 @@ public class CompileHelper {
             String shellCommand = "sh " + kotlinc + " -jdk-home " + javaHomePath
                     + mainKotlincArgs + sb.toString();
 
-//            WinkLog.d("[LiteBuild] kotlinc shellCommand : " + shellCommand);
+            WinkLog.d("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.ShellResult result = Utils.runShells(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
