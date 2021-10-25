@@ -8,10 +8,12 @@ import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 import org.apache.http.util.TextUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,19 +55,31 @@ public class CompileHelper {
         }
 
         if (changedAnnotationList.size() > 0) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Settings.data.projectBuildSortList.size(); i++) {
-                if (TextUtils.isEmpty(Settings.data.projectBuildSortList.get(i).fixedInfo.classPath)) {
-                    continue;
-                }
-                sb.append(Settings.data.projectBuildSortList.get(i).fixedInfo.classPath);
-                if (i != Settings.data.projectBuildSortList.size() - 1) {
-                    sb.append(":");
-                }
-            }
-            compileKaptFile(sb.toString());
+            String classPathStr = getFullClasspathString();
+            compileKaptFile(classPathStr);
         }
         createDexPatch();
+    }
+
+    @NotNull
+    private String getFullClasspathString() {
+        Set<String> hashSet = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < Settings.data.projectBuildSortList.size(); i++) {
+            if (TextUtils.isEmpty(Settings.data.projectBuildSortList.get(i).fixedInfo.classPath)) {
+                continue;
+            }
+            String[] classPathArr = Settings.data.projectBuildSortList.get(i).fixedInfo.classPath.split(":");
+            Collections.addAll(hashSet, classPathArr);
+        }
+        for (String classPath : hashSet) {
+            sb.append(classPath);
+            sb.append(":");
+        }
+        if (sb.lastIndexOf(":") == sb.length() - 1) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
     }
 
     /**
