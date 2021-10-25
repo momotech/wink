@@ -10,7 +10,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.immomo.wink.databinding.ActivityMain4Binding
 import org.greenrobot.eventbus.EventBus
 
-@Route(path = "/com/Activity4444")
+@Route(path = "/com/Activity4")
 class MainActivity4 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

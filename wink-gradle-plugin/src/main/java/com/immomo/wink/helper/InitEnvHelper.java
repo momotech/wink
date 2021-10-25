@@ -47,6 +47,7 @@ import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -405,6 +406,7 @@ public class InitEnvHelper {
 //        }
 
         args.add("-classpath");
+        Settings.env.javaCommandPre = new ArrayList<>(args);
 
         WinkLog.d(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + javaCompile.getClasspath().getAsPath());
 

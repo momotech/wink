@@ -91,6 +91,7 @@ object Settings {
         @JvmField var annotationProcessorOptions: Map<String,String>? = HashMap<String,String>(),
         @JvmField var jvmTarget: String? = null,
         @JvmField var branch: String = "debug",
+        @JvmField var javaCommandPre: MutableList<String> = ArrayList(),
     ) : Serializable
 
     data class Data(

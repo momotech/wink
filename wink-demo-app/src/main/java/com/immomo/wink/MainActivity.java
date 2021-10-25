@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
-            ARouter.getInstance().build("/com/Activity4444").navigation();
+            ARouter.getInstance().build("/com/Activity4").navigation();
             EventBus.getDefault().post(new MessageEvent());
         });
 

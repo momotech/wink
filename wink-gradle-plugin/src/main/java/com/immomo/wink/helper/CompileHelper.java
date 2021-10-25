@@ -81,7 +81,7 @@ public class CompileHelper {
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             // kotlin 记录的路径为 /Users/momo/Documents/MomoProject/wink/wink-demo-app/build/tmp/kapt3/stubs/debug/com/immomo/wink/MainActivity2.java
             for (String changedKotlinFile : project.changedKotlinFiles) {
-                WinkLog.d("changedKotlinFile <><><><><><>" + changedKotlinFile);
+                WinkLog.d("changedKotlinFile >>>>>>>>>>>>>>>>>>>>> " + changedKotlinFile);
                 List<String> annotations = Settings.data.processorMapping.file2AnnotationsMapping.get(changedKotlinFile);
                 if (annotations == null || annotations.size() == 0) {
                     continue;
@@ -145,8 +145,15 @@ public class CompileHelper {
                 }
             }
         }
-        String command = "javac -source 1.8 -target 1.8 -encoding UTF-8 -bootclasspath /Users/momo/Library/Android/sdk/platforms/android-30/android.jar:/Users/momo/Library/Android/sdk/build-tools/30.0.3/core-lambda-stubs.jar -g -classpath "
-                + classPath + " -d /Users/momo/Documents/MomoProject/wink/.idea/wink/tmp_class " + sb.toString();
+
+        StringBuilder commandPre = new StringBuilder();
+        commandPre.append("javac");
+        for (int i = 0; i <  Settings.env.javaCommandPre.size(); i++) {
+            commandPre.append(" ");
+            commandPre.append( Settings.env.javaCommandPre.get(i));
+        }
+
+        String command = commandPre.toString() + " " + classPath + " -d " + Settings.env.tmpPath + "/tmp_class" + sb.toString();
         Utils.runShells(command);
     }
 
