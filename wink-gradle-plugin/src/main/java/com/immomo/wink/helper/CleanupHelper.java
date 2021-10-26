@@ -43,6 +43,8 @@ public class CleanupHelper {
         deleteAllDex();
         delete("diff");
         delete("tmp_class");
+        delete("tmp_kapt_stubs");
+        delete("tmp_apt_gen");
         delete("env");
         delete("stableIds.txt");
         delete("tmp_class.zip");
@@ -57,6 +59,8 @@ public class CleanupHelper {
 
         delete("diff");
         delete("tmp_class");
+        delete("tmp_kapt_stubs");
+        delete("tmp_apt_gen");
         delete("env");
         delete("tmp_class.zip");
 

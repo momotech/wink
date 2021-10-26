@@ -144,30 +144,16 @@ public class CompileHelper {
         return project.changedJavaFiles.size();
     }
 
-    //TODO-YWB: classpath 去重
     private void compileKaptFile(String classPath) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ").append(Settings.env.tmpPath).append("/tmp_class/com/alibaba/android/arouter/routes/*.java");
-        WinkLog.d("[compileKaptFile]", sb.toString());
-        if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
-            for (String processorOption : Settings.env.kaptTaskParam.processorOptions) {
-                String[] split = processorOption.split(":");
-                String[] split1 = split[split.length - 1].split("=");
-                WinkLog.w("processorOption : " + split1[0] + " === " + split1[1]);
-                if ("eventBusIndex".equals(split1[0])) {
-                    sb.append(" ").append(Settings.env.tmpPath).append("/tmp_class/").append(split1[1].replace(".", "/")).append(".java");
-                }
-            }
-        }
-
         StringBuilder commandPre = new StringBuilder();
         commandPre.append("javac");
         for (int i = 0; i <  Settings.env.javaCommandPre.size(); i++) {
             commandPre.append(" ");
             commandPre.append( Settings.env.javaCommandPre.get(i));
         }
-
-        String command = commandPre.toString() + " " + classPath + " -d " + Settings.env.tmpPath + "/tmp_class" + sb.toString();
+        String command = commandPre.toString() + " " + classPath
+                + " -d " + Settings.env.tmpPath + "/tmp_class" + " "
+                + "$(find " + Settings.env.tmpPath + "/tmp_apt_gen -name \"*.java\")";
         Utils.runShells(command);
     }
 
@@ -279,8 +265,8 @@ public class CompileHelper {
 
 
     private String getKapt3Params(String kaptEncodeOption) {
-        return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/wink/tmp_class \\\n" +
-                "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/wink/tmp_class \\\n" +
+        return "-P plugin:org.jetbrains.kotlin.kapt3:sources=.idea/wink/tmp_apt_gen \\\n" +
+                "-P plugin:org.jetbrains.kotlin.kapt3:classes=.idea/wink/tmp_apt_gen \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:stubs=.idea/wink/tmp_kapt_stubs \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true \\\n" +
                 "-P plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt \\\n" +
