@@ -396,6 +396,9 @@ public class CompileHelper {
                 + " " + Settings.env.tmpPath + "/tmp_class.zip";
 
         if (Settings.data.hasResourceAddOrRename) {
+            // 不同版本 AGP 生成 R 文件路径不一致
+            // 4.0.0+ 版本：R.jar
+            // before 4.0.0：多个 R.class 文件
             cmds += " " + Settings.env.appProjectDir + "/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/" + Settings.env.variantName + "/R.jar";
         }
         return cmds;
