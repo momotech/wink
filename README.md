@@ -40,7 +40,7 @@ In Android development process, the build speed of the application directly affe
 Add the current latest plugin address and version number to `build.gradle` in the project root path as follows
 
 ```groovy
-classpath 'com.immomo.wink:plugin:0.3.23'
+classpath 'com.immomo.wink:plugin:0.3.27'
 ```
 
 Apply the plugin to `build.gradle` in the main project `app` (you only need to apply the plugin to the main app project, not to each module):
@@ -63,7 +63,7 @@ winkOptions {
 
 When the configuration is done, synchronize the project, you need to run the project completely with `AS->Run` or `assembleDebug` before executing `wink` to make sure the code on the computer side and mobile side is the same.  
 
---
+---
 
 #### ARouter & EventBus annotation support (not required, on-demand dependency)
 Just add winnk-compiler (reads annotations and file dependencies), currently annotationProcessor `depends on kotlin environment`.
@@ -120,6 +120,14 @@ Then make the code changes normally and execute in Terminal.
 The successful execution will restart the App changes to take effect!
 
 PS: Execution by script can circumvent the time consuming Gradle initialization, the effect reflected in the Stranger App is that the time consuming of incrementing once is reduced from 10s to 3s`
+
+### ERROR
+
+Make sure `./gradlew installDebug` can run well, Otherwise `./gradlew wink` or `./wink.sh` task will throw an Exception.
+
+If the above happens. Try to set `JAVA_HONE` environment as same as AndroidStudio `JDK location` path.
+![WechatIMG2.png](http://tva1.sinaimg.cn/large/0020yNeuly1gv99jveyygj61au0pqqa702.jpg)
+
 
 ### Update log
 

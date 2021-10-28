@@ -40,7 +40,7 @@ Wink是AndroidStudio的一个快速构建插件。Wink的目标是建立一个�
 在项目根路径的 `build.gradle` 中加入当前最新的插件地址和版本号如下：
 
 ```groovy
-classpath 'com.immomo.wink:plugin:0.3.23'
+classpath 'com.immomo.wink:plugin:0.3.27'
 ```
 
 在主工程 `app` 中的 `build.gradle` 应用该插件（只需在主 app 工程中应用插件即可，无需每个 module 都应用）:
@@ -101,7 +101,7 @@ https://s.momocdn.com/s1/u/geajgghjh/Wink-2.1.2.zip
 
 ## 快速启动方式二：脚本执行
 ### 首次安装Wink需初始化
-执行Task `winkInitWithShell`
+执行 Task `winkInitWithShell`
 ```groovy
 ./gradlew winkInitWithShell
 ```
@@ -116,6 +116,14 @@ https://s.momocdn.com/s1/u/geajgghjh/Wink-2.1.2.zip
 执行成功后会重启App变更生效！
 
 `PS：用脚本执行能规避Gradle初始化的耗时，在陌陌App中体现的效果是增量一次的耗时由10s降低到3s`
+
+### 集成异常处理
+
+需要确保在终端执行 `./gradlew installDebug` 可以正常运行，否则在未执行全量包时，执行 `./gradlew wink` 或 `./wink.sh` 会报错。
+
+如果出现异常，可以尝试配置 `JAVA_HONE` 路径与 AndroidStudio `JDK location` 路径一致。
+![WechatIMG2.png](http://tva1.sinaimg.cn/large/0020yNeuly1gv99jveyygj61au0pqqa702.jpg)
+
 
 ### 更新日志
 
