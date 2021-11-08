@@ -1,12 +1,8 @@
 plugins {
-    id 'java-library'
-//    id 'com.android.library' 打包时有问题可以临时使用
-
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+//    id 'com.android.library'
+//    id 'maven'
+    id 'kotlin'
+    id "org.jetbrains.kotlin.jvm"
 }
 
 ext {
@@ -17,14 +13,46 @@ ext {
     libraryVersion = '1.0'
 }
 
+//android {
+//    compileSdkVersion 29
+//    buildToolsVersion "29.0.3"
+//
+//    defaultConfig {
+//        minSdkVersion 21
+//        targetSdkVersion 29
+//        versionCode 1
+//        versionName "1.0"
+//
+//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        consumerProguardFiles "consumer-rules.pro"
+//    }
+//
+//    buildTypes {
+//        release {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//        }
+//        debug {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//        }
+//    }
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
+////    kotlinOptions {
+////        jvmTarget = '1.8'
+////    }
+//}
 //java {
 //    sourceCompatibility = JavaVersion.VERSION_1_7
 //    targetCompatibility = JavaVersion.VERSION_1_7
 //}
 
 dependencies {
-    compileOnly files('libs/tools.jar')
-    compileOnly files('libs/rt.jar')
+    compileOnly(files('libs/tools.jar'))
+    compileOnly(files('libs/rt.jar'))
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
     implementation 'com.google.auto.service:auto-service-annotations:1.0-rc7'
 
@@ -32,7 +60,11 @@ dependencies {
 //    implementation 'com.squareup:javapoet:1.13.0'
 //    implementation 'org.projectlombok:lombok:1.18.2'
 
-//    implementation 'org.apache.commons:commons-lang3:3.5'
-//    implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.apache.commons:commons-lang3:3.5'
+    implementation 'org.apache.commons:commons-collections4:4.1'
 }
+//java {
+//    sourceCompatibility = JavaVersion.VERSION_1_8
+//    targetCompatibility = JavaVersion.VERSION_1_8
+//}
 //apply from: '../wink-publish/upload_compiler_hook.gradle'

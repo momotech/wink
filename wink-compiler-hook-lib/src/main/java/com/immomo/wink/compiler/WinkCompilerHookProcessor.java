@@ -176,9 +176,11 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                             processorMapping.file2AnnotationsMapping.get(sourceFilePath).add(annotation);
                         }
                     }
+                    Log.i("WinkProcessor =============================>>>>>>");
                     // 写入文件
                 } catch (Exception e) {
-
+                    e.printStackTrace();
+                    Log.i("WinkProcessor : " + e.toString());
                 }
             }
 
@@ -193,14 +195,17 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
                 System.out.println("processorMapping ===>>>>>>>>>>");
                 System.out.println(processorMapping.toString());
+                Log.i("WinkProcessor saved file path : " + userDirectory + "/.idea/wink/annotation/mapping");
                 LocalCacheUtil.save2File(processorMapping, userDirectory + "/.idea/wink/annotation/mapping");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.i("WinkProcessor111 : " + e.toString());
         }
 
 
+        Log.i("WinkProcessor finish !!!!!!!!!!!!");
         return false;
     }
 }

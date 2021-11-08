@@ -43,6 +43,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+//    packagingOptions {
+//        exclude 'META-INF/daemon-common.kotlin_module'
+//        exclude 'META-INF/deserialization.common.jvm.kotlin_module'
+//    }
 }
 
 kapt {
@@ -52,6 +57,8 @@ kapt {
 }
 
 dependencies {
+    kapt project(':mode_processor')
+    implementation project(path: ':mode_anno')
     implementation 'org.greenrobot:eventbus:3.2.0'
     kapt "org.greenrobot:eventbus-annotation-processor:3.2.0"
     kapt project(':wink-compiler-hook-lib')
@@ -73,4 +80,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 //    implementation 'com.immomo.wink:plugin:0.3.22'
+//    implementation 'com.immomo.wink:plugin:0.3.30'
 }

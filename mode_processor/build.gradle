@@ -1,0 +1,20 @@
+plugins {
+    id 'kotlin'
+    id "org.jetbrains.kotlin.jvm"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+dependencies {
+    //noinspection GradlePath
+//    compileOnly files('/Applications/Android Studio 2.app/Contents/jre/jdk/Contents/Home/lib/tools.jar')
+    compileOnly files('libs/tools.jar')
+    implementation project(':mode_anno')
+    implementation 'com.squareup:javapoet:1.13.0'
+    implementation 'com.google.auto.service:auto-service-annotations:1.0-rc7'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
+
+}

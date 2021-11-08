@@ -91,7 +91,7 @@ object Settings {
         @JvmField var annotationProcessorOptions: Map<String,String>? = HashMap<String,String>(),
         @JvmField var jvmTarget: String? = null,
         @JvmField var branch: String = "debug",
-        @JvmField var javaCommandPre: MutableList<String> = ArrayList(),
+        @JvmField var javaCommandPre: MutableList<String> = ArrayList()
     ) : Serializable
 
     data class Data(
@@ -124,7 +124,7 @@ object Settings {
             @JvmField var changedJavaFiles: MutableList<String> = ArrayList(),
             @JvmField var changedKotlinFiles: MutableList<String> = ArrayList(),
             @JvmField var hasResourceChanged: Boolean = false,
-            @JvmField var hasAddNewOrChangeResName: Boolean = false,
+            @JvmField var hasAddNewOrChangeResName: Boolean = false
     ) : Serializable
 
     data class KaptTaskParam(@JvmField var compileClassPath: String? = null,

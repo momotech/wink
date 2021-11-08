@@ -91,7 +91,6 @@ public class CompileHelper {
             WinkLog.i("注解映射关系为空，本次无法编译注解");
             return annotationFiles;
         }
-        WinkLog.d("Settings.data.processorMapping : " + Settings.data.processorMapping.toString());
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             // kotlin 记录的路径为 /Users/momo/Documents/MomoProject/wink/wink-demo-app/build/tmp/kapt3/stubs/debug/com/immomo/wink/MainActivity2.java
             for (String changedKotlinFile : project.changedKotlinFiles) {
@@ -299,16 +298,13 @@ public class CompileHelper {
         try {
             String mainKotlincArgs = project.fixedInfo.kotlincArgs;
 
-            // todo apt
-//            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
-
             String javaHomePath = Settings.env.javaHome;
             javaHomePath = javaHomePath.replace(" ", "\\ ");
 
-            // todo apt
-//            String shellCommand = "sh " + kotlinc + kotlinxArgs + " -jdk-home " + javaHomePath
-//                    + mainKotlincArgs + sb.toString();
-            String shellCommand = "sh " + kotlinc + " -jdk-home " + javaHomePath
+            String shellCommand = "sh " + kotlinc
+                    // 兼容 kotlin internal 属性
+                    + " -Xfriend-paths=" + project.fixedInfo.buildDir + "/tmp/kotlin-classes/debug "
+                    + " -jdk-home " + javaHomePath
                     + mainKotlincArgs + sb.toString();
 
             WinkLog.d("[LiteBuild] kotlinc shellCommand : " + shellCommand);

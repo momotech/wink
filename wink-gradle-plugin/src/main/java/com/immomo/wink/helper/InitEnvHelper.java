@@ -78,7 +78,6 @@ public class InitEnvHelper {
 
         // Data每次初始化
         Settings.initData();
-        WinkLog.d("Settings.annotationMappingInfo ==============>>>>>>>>>>>>>>>>>>>>>>> : " + Settings.data.processorMapping.toString());
     }
 
     public void createEnv(Project project) {

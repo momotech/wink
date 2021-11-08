@@ -9,44 +9,46 @@ import com.immomo.wink.util.WinkLog;
 
 public class JavaEntrance {
     public static void main(String[] args) {
-        if (args == null || args.length == 0) {
-            WinkLog.throwAssert("Java 命令需要指定参数：path");
-            return;
-        }
+        try {
+            if (args == null || args.length == 0) {
+                WinkLog.throwAssert("Java 命令需要指定参数：path");
+                return;
+            }
 
-        WinkLog.d("====== 开始执行 Java 任务 ======");
+            WinkLog.d("====== 开始执行 Java 任务 ======");
 
-        String path = args[0];
+            String path = args[0];
 //        String func = args[1];
 
-        WinkLog.d("====== path : " + path);
+            WinkLog.d("====== path : " + path);
 
-        InitEnvHelper helper = new InitEnvHelper();
+            InitEnvHelper helper = new InitEnvHelper();
 
-        WinkLog.i("Wink start...");
-        if (helper.isEnvExist(path)) {
-            // Increment
-            helper.initEnvFromCache(path);
-            if (!helper.isBranchOK()) {
+            WinkLog.i("Wink start...");
+            if (helper.isEnvExist(path)) {
+                // Increment
+                helper.initEnvFromCache(path);
+                if (!helper.isBranchOK()) {
+                    new IncrementPatchHelper().fullBuildByInstallDebug(path);
+                    return;
+                }
+            } else {
                 new IncrementPatchHelper().fullBuildByInstallDebug(path);
                 return;
             }
-        } else {
-            new IncrementPatchHelper().fullBuildByInstallDebug(path);
-            return;
-        }
+            if (!helper.isAnnotationMappingExist(path)) {
+                WinkLog.i("===>>> 注解映射文件不存在，本次编译不会更新注解。");
+            }
+            // Diff file changed
+            runDiff();
 
-        if (!helper.isAnnotationMappingExist(path)) {
-            WinkLog.i("===>>> 注解映射文件不存在，本次编译不会更新注解。");
-        }
-
-        // Diff file changed
-        runDiff();
-
-        new ResourceHelper().checkResourceWithoutTask(); // 内部判断：Settings.data.hasResourceChanged
-        new CompileHelper().compileCode();
-        if (new IncrementPatchHelper().patchToApp()) {
-            updateSnapShot();
+            new ResourceHelper().checkResourceWithoutTask(); // 内部判断：Settings.data.hasResourceChanged
+            new CompileHelper().compileCode();
+            if (new IncrementPatchHelper().patchToApp()) {
+                updateSnapShot();
+            }
+        } catch (Exception e) {
+            WinkLog.w(e.toString());
         }
     }
 
