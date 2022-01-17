@@ -162,11 +162,13 @@ public class WinkPlugin implements Plugin<Project> {
         // 产生快照
         DiffHelper.initAllSnapshot();
 
+        WinkLog.d("before cacheApkFile()");
         cacheApkFile(project);
-
+        WinkLog.d("before createKotlinFile()");
         createKotlinFile(project);
-
+        WinkLog.d("before pushVersionFileToDevice()");
         pushVersionFileToDevice(project);
+        WinkLog.d("end....................");
     }
 
     // 创建 Kotlin 文件，用来 kapt 编译

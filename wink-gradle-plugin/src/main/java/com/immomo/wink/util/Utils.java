@@ -86,7 +86,7 @@ public class Utils {
     }
 
     public static ShellResult runShells(String... cmds) {
-        return runShells(ShellOutput.ONLY_ERROR, cmds);
+        return runShells(ShellOutput.ALL, cmds);
     }
 
     public static ShellResult runShells(ShellOutput output, String... cmds) {
