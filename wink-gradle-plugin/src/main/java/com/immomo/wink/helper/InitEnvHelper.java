@@ -78,7 +78,7 @@ public class InitEnvHelper {
 
         // Data每次初始化
         Settings.initData();
-        WinkLog.d("Settings.annotationMappingInfo ==============>>>>>>>>>>>>>>>>>>>>>>> : " + Settings.data.processorMapping.toString());
+//        WinkLog.d("Settings.annotationMappingInfo ==============>>>>>>>>>>>>>>>>>>>>>>> : " + Settings.data.processorMapping.toString());
     }
 
     public void createEnv(Project project) {
@@ -122,8 +122,10 @@ public class InitEnvHelper {
 
         env.packageName = androidExt.getDefaultConfig().getApplicationId();
         Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+        WinkLog.d("[IniEnvHelper] ApplicationVariant env.variantName:" + env.variantName);
         while (itApp.hasNext()) {
             ApplicationVariant variant = itApp.next();
+            WinkLog.d("[IniEnvHelper] ApplicationVariant variant:" + variant.getName());
             if (variant.getName().equals(env.variantName)) {
                 env.debugPackageName = variant.getApplicationId();
                 break;
@@ -178,6 +180,8 @@ public class InitEnvHelper {
 
     public boolean isEnvExist(String path) {
         String envFilePath = path + "/.idea/" + Settings.NAME + "/env";
+//        String envFilePath = "/Users/momo/projects/winkDev/.idea/wink/env";
+        WinkLog.d("[isEnvExist]  envFilePath==" + envFilePath);
         File envFile = new File(envFilePath);
         return envFile.exists();
     }

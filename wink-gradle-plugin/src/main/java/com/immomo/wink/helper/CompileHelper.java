@@ -379,6 +379,7 @@ public class CompileHelper {
         String cmds = useD8(patchName);
 
         WinkLog.TimerLog log = WinkLog.timerStart("开始打DexPatch！");
+        WinkLog.d("createDexPatch cmds:" + cmds);
 
         Utils.runShells(Utils.ShellOutput.NONE, cmds);
 

@@ -42,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(new Test111().getAAA() + "2" + new ZZ().getKK());
-//        textView.setText(Tools.getTitle() + "xx1");
+        textView.setText(new Test111().getAAA() + "3" + new ZZ().getKK());
 
         textView.setOnClickListener((v)->{
             ARouter.getInstance().build("/com/Activity4").navigation();

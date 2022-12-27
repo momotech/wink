@@ -28,10 +28,12 @@ public class JavaEntrance {
             // Increment
             helper.initEnvFromCache(path);
             if (!helper.isBranchOK()) {
+                WinkLog.i("Wink start !helper.isBranchOK()");
                 new IncrementPatchHelper().fullBuildByInstallDebug(path);
                 return;
             }
         } else {
+            WinkLog.i("Wink start helper.isEnvExist = false");
             new IncrementPatchHelper().fullBuildByInstallDebug(path);
             return;
         }

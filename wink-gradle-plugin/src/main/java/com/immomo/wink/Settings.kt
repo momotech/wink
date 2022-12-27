@@ -54,13 +54,13 @@ object Settings {
     @JvmStatic
     fun initData(): Data {
         data = Data()
-        env!!.projectBuildSortList.forEach {
+        env.projectBuildSortList.forEach {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
 
         data.beginTime = System.currentTimeMillis()
         // todo apt
-        data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
+        // data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
 //        WinkLog.d("data.processorMapping ::::::::::::::::::: " + data.processorMapping)
 
         return data
