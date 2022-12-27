@@ -66,10 +66,22 @@ public class WinkPlugin implements Plugin<Project> {
             }
         });
 
+        Settings.data.newVersion = "1000000000";
+        appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_BT", "\"" + 111111111 + "\"");
+        appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_DC", "\"" + 222222222 + "\"");
+        appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
+
         project.getExtensions().create("winkOptions",
                 WinkOptions.class);
 
+        project.beforeEvaluate(it -> {
+            appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_BEFORE_1", "\"" + 111111111 + "\"");
+            appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_BEFORE", "\"" + 222222222 + "\"");
+        });
         project.afterEvaluate(it -> {
+            appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_AFTER_1", "\"" + 111111111 + "\"");
+            appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_AFTER", "\"" + 222222222 + "\"");
+
             WinkLog.TimerLog timerAfterEvaluate = WinkLog.timerStart("timerAfterEvaluate");
             createWinkTask(it);
             createWinkInitEnvTask(it);
@@ -98,15 +110,21 @@ public class WinkPlugin implements Plugin<Project> {
 
         // Init wink info after packageDebug.
         Task packageDebug = GradleUtils.getFlavorTask(project, "package", "Debug");
-        packageDebug.doLast(task -> afterFullBuild(project));
+        packageDebug.doLast(new Action<Task>() {
+            @Override
+            public void execute(Task task) {
+                afterFullBuild(project);
+            }
+        });
 
         // Embedded WINK_VERSION.
-        GradleUtils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
-            Settings.data.newVersion = System.currentTimeMillis() + "";
-            ((AppExtension) project.getExtensions().getByName("android"))
-                    .getDefaultConfig().buildConfigField("String",
-                    "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
-        });
+//        GradleUtils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
+//            Settings.data.newVersion = System.currentTimeMillis() + "";
+//            WinkLog.d("Embedded WINK_VERSION , newVersion:" + Settings.data.newVersion);
+//            ((AppExtension) project.getExtensions().getByName("android"))
+//                    .getDefaultConfig().buildConfigField("String",
+//                    "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
+//        });
     }
 
     public void createWinkTask(Project project) {

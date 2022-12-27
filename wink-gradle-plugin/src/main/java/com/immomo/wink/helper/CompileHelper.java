@@ -47,10 +47,12 @@ public class CompileHelper {
         compileKapt(changedAnnotationList);
 
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
+            WinkLog.d("compileCode >>>>>>>>>>>>>>>>>>> compileKotlin");
             compileKotlin(project);
         }
 
         for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
+            WinkLog.d("compileCode >>>>>>>>>>>>>>>>>>> compileJava");
             compileJava(project);
         }
 

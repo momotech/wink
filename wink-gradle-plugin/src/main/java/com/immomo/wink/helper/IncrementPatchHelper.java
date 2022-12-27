@@ -65,7 +65,7 @@ public class IncrementPatchHelper {
      */
     private void installLocalApk_Version(String deviceId) {
         WinkLog.i("与本机打包 Apk 版本不一致，安装本地版本 Apk 与补丁包");
-        Utils.runShells("adb -s " + deviceId + " install " + Settings.env.tmpPath + "/temp.apk");
+        Utils.runShells("adb -s -t " + deviceId + " install " + Settings.env.tmpPath + "/temp.apk");
 
         String versionPath = PathUtils.getVersionPath(deviceId);
 

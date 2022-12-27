@@ -185,11 +185,13 @@ public class FixDexUtil {
     }
 
     public static File getDexPatchFile(Context context) {
-        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.png";
+        String winkVersion = FixDexUtil.getPatchVersion(context);
+        String patchName = winkVersion + "_patch.png";
         String dexPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/" + context.getPackageName() + "/patch_file/" + patchName;
 
-        Log.e("weijiangnan", "version" + patchName);
+        Log.e("weijiangnan", "version: " + patchName);
+        Log.e("weijiangnan", "wink_version in BuildConfig is : " + winkVersion);
         File dexFile = new File(dexPath);
         if (dexFile.exists()) {
             return dexFile;
