@@ -11,23 +11,22 @@ winkOptions {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdk 31
 
     defaultConfig {
         applicationId "com.immomo.wink"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [ moduleName : project.getName() ]
-                includeCompileClasspath true
-            }
-        }
+//        javaCompileOptions {
+//            annotationProcessorOptions {
+//                arguments = [ moduleName : project.getName() ]
+//                includeCompileClasspath true
+//            }
+//        }
     }
     dataBinding {
         enabled = true
@@ -46,8 +45,10 @@ android {
 }
 
 kapt {
+    generateStubs = true
     arguments {
         arg('eventBusIndex', 'com.immomo.wink.MyEventBusIndex')
+        arg("moduleName", project.getName() )
     }
 }
 
@@ -62,7 +63,7 @@ dependencies {
     kapt 'com.jakewharton:butterknife-compiler:10.2.3'
 //    implementation project(':wink-compiler-hook-lib')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile 'com.alibaba:arouter-api:1.2.1.1'
+    implementation 'com.alibaba:arouter-api:1.2.1.1'
     kapt 'com.alibaba:arouter-compiler:1.1.2.1'
 //    implementation 'com.alibaba:arouter-api:1.5.2'
 //    annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'

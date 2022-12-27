@@ -35,7 +35,7 @@ public class GradleUtils {
                 }
             }
         }
-
+        System.out.println("getFlavorTask name : " + pre + post);
         return project.getTasks().getByName(pre + post);
     }
 }
