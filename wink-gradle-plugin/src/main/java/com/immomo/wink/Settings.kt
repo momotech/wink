@@ -59,9 +59,10 @@ object Settings {
         }
 
         data.beginTime = System.currentTimeMillis()
-        // todo apt
-        // data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
-//        WinkLog.d("data.processorMapping ::::::::::::::::::: " + data.processorMapping)
+
+
+        data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
+        WinkLog.d("data.processorMapping ::::::::::::::::::: " + data.processorMapping)
 
         return data
     }
