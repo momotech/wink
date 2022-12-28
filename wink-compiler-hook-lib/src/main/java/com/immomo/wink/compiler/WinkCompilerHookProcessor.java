@@ -28,9 +28,9 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-//        System.out.println("=======================");
-//        System.out.println("   process run !!!   ");
-//        System.out.println("=======================");
+        System.out.println("=======================");
+        System.out.println("   [Wink] processor run !!!   ");
+        System.out.println("=======================");
 //
 //        System.out.println("TypeElement ===>>> : " + set.toString());
 
@@ -145,9 +145,18 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                         // 文件地址
 //                        symbol.sourcefile.getName();
 
-                        Field fileField = symbol.sourcefile.getClass().getDeclaredField("file");
-                        fileField.setAccessible(true);
-                        File sourceFile = (File) fileField.get(symbol.sourcefile);
+                        String sourceFilePath = "";
+                        File sourceFile = null;
+                        try {
+                            Field fileField = symbol.sourcefile.getClass().getDeclaredField("file");
+                            fileField.setAccessible(true);
+                            sourceFile = (File) fileField.get(symbol.sourcefile);
+                            sourceFilePath = sourceFile.getAbsolutePath();
+                        } catch (Exception e) {
+                            sourceFilePath = symbol.sourcefile.getName();
+                            sourceFile = new File(sourceFilePath);
+
+                        }
 
                         /*
                          * 目前拿到的文件是 kapt 生成 stubs 的 .java 文件，没有好的方式直接获取到 .kt 文件
@@ -155,8 +164,6 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                          * /Users/momo/Documents/MomoProject/wink/wink-demo-app/   src/main/java                 /com/immomo/wink/MainActivity3.java
                          * /Users/momo/Documents/MomoProject/wink/wink-demo-app/   build/tmp/kapt3/stubs/debug   /com/immomo/wink/MainActivity2.java
                          */
-
-                        String sourceFilePath = sourceFile.getAbsolutePath();
 
                         if (sourceFilePath.contains("build/tmp/kapt3/stubs/debug")) {
                             sourceFilePath = sourceFilePath.replace("build/tmp/kapt3/stubs/debug", "src/main/java").replace(".java", ".kt");
@@ -182,8 +189,10 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
                 }
             }
 
+            System.out.println("processorMapping ===================================>>>>>>>>>>");
             if (processorMapping.annotation2FilesMapping.size() > 0) {
                 String userDirectory = new File("").getAbsolutePath();
+//                String userDirectory = "/Users/momo/Documents/MomoProject/wink";
                 System.out.println("userDirectory ===>>>>>>>>>> " + userDirectory);
 
                 File fileDir = new File(userDirectory + "/.idea/wink/annotation/");
@@ -193,6 +202,8 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
                 System.out.println("processorMapping ===>>>>>>>>>>");
                 System.out.println(processorMapping.toString());
+                String filePath = userDirectory + "/.idea/wink/annotation/mapping";
+                System.out.println("filePath : " + filePath);
                 LocalCacheUtil.save2File(processorMapping, userDirectory + "/.idea/wink/annotation/mapping");
             }
 
