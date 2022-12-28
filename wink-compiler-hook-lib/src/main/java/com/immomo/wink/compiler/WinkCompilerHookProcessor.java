@@ -31,7 +31,6 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
         System.out.println("=======================");
         System.out.println("   [Wink] processor run !!!   ");
         System.out.println("=======================");
-//
 //        System.out.println("TypeElement ===>>> : " + set.toString());
 
         /*
@@ -97,13 +96,35 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
             List<String> whiteList = new ArrayList<>();
             //BufferedReader是可以按行读取文件
+
+//            FileInputStream inputStream1 = new FileInputStream(".idea/wink_annotation_whitelist111.txt");
+//            BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(inputStream1));
+//
+//            Field[] fields = inputStream1.getClass().getDeclaredFields();
+//
+//            for(Field f : fields){
+//                int i = f.getModifiers();
+//                f.setAccessible(true);
+//                System.out.println("修饰符列表:" + Modifier.toString(i) +
+//                        "返回类型:" + f.getType() +
+////                        "属性名：" + f.getName()
+//                        "属性名：" + f.getName() + " === " + f.get(inputStream1)
+//                );
+//            }
+
+            String tempPath = null;
+
             FileInputStream inputStream = new FileInputStream(".idea/wink_annotation_whitelist.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
             String str = null;
             while((str = bufferedReader.readLine()) != null)
             {
-                whiteList.add(str);
+                if (str.startsWith("winkProjectPath=")) {
+                    tempPath = str.replace("winkProjectPath=", "");
+                } else {
+                    whiteList.add(str);
+                }
 //                System.out.println(str);
             }
 
@@ -191,7 +212,8 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 
             System.out.println("processorMapping ===================================>>>>>>>>>>");
             if (processorMapping.annotation2FilesMapping.size() > 0) {
-                String userDirectory = new File("").getAbsolutePath();
+                String userDirectory = tempPath;
+//                String userDirectory = new File("").getAbsolutePath();
 //                String userDirectory = "/Users/momo/Documents/MomoProject/wink";
                 System.out.println("userDirectory ===>>>>>>>>>> " + userDirectory);
 
