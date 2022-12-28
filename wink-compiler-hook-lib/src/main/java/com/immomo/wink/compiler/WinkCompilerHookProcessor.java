@@ -113,7 +113,8 @@ public class WinkCompilerHookProcessor extends AbstractProcessor {
 //            }
 
             String tempPath = null;
-
+            // 奇怪的现象， new File(".idea/wink_annotation_whitelist.txt"); 的路径与
+            // new FileInputStream(".idea/wink_annotation_whitelist.txt"); 的路径不一致
             FileInputStream inputStream = new FileInputStream(".idea/wink_annotation_whitelist.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
