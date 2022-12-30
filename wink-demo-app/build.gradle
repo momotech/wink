@@ -21,6 +21,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        def buildTime = System.currentTimeMillis()
+        buildConfigField "String", "WINK_VERSION", "\"${buildTime}\""
+
 //        javaCompileOptions {
 //            annotationProcessorOptions {
 //                arguments = [ moduleName : project.getName() ]
@@ -36,11 +40,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            buildConfigField("String", "WINK_VERSION", "\"release111\"")
+
         }
         debug {
             minifyEnabled false
-//            buildConfigField("String", "WINK_VERSION", "\"debug111\"")
         }
     }
     compileOptions {

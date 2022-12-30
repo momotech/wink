@@ -102,6 +102,7 @@ public class InitEnvHelper {
         }
 
         if (!Settings.data.newVersion.isEmpty()) {
+            WinkLog.i("InitEnvHelper.createEnv() : " + Settings.data.newVersion);
             env.version = Settings.data.newVersion;
             Settings.data.newVersion = "";
         }

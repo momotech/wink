@@ -16,8 +16,11 @@
 
 package com.immomo.wink;
 
+import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
+
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
+import com.android.builder.model.ClassField;
 import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.InitEnvHelper;
@@ -38,8 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-
-import static com.immomo.wink.helper.InitEnvHelper.obtainAppDebugPackageName;
+import java.util.Map;
 
 public class WinkPlugin implements Plugin<Project> {
 
@@ -66,21 +68,13 @@ public class WinkPlugin implements Plugin<Project> {
             }
         });
 
-        Settings.data.newVersion = "1000000000";
-        appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_BT", "\"" + 111111111 + "\"");
-        appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_DC", "\"" + 222222222 + "\"");
-        appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
 
         project.getExtensions().create("winkOptions",
                 WinkOptions.class);
 
         project.beforeEvaluate(it -> {
-            appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_BEFORE_1", "\"" + 111111111 + "\"");
-            appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_BEFORE", "\"" + 222222222 + "\"");
         });
         project.afterEvaluate(it -> {
-            appExtension.getBuildTypes().maybeCreate("debug").buildConfigField("String", "WINK_VERSION_AFTER_1", "\"" + 111111111 + "\"");
-            appExtension.getDefaultConfig().buildConfigField("String", "WINK_VERSION_AFTER", "\"" + 222222222 + "\"");
 
             WinkLog.TimerLog timerAfterEvaluate = WinkLog.timerStart("timerAfterEvaluate");
             createWinkTask(it);
@@ -118,13 +112,27 @@ public class WinkPlugin implements Plugin<Project> {
         });
 
         // Embedded WINK_VERSION.
-//        GradleUtils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
+        GradleUtils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
 //            Settings.data.newVersion = System.currentTimeMillis() + "";
 //            WinkLog.d("Embedded WINK_VERSION , newVersion:" + Settings.data.newVersion);
-//            ((AppExtension) project.getExtensions().getByName("android"))
-//                    .getDefaultConfig().buildConfigField("String",
-//                    "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
-//        });
+
+            AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+            Map<String, ClassField> buildConfigFields = appExtension.getDefaultConfig().getBuildConfigFields();
+            WinkLog.d("buildConfigData", "buildConfigFields : " + buildConfigFields.toString());
+//            String winkVersion = appExtension.getDefaultConfig().getBuildConfigFields().get("WINK_VERSION_").getValue();
+//            WinkLog.i("winkVersion", "winkVersionYWB : " + winkVersion);
+
+            if (buildConfigFields.get("WINK_VERSION") == null) {
+                WinkLog.throwAssert("================== WINK_VERSION 配置开始 ====================\n" +
+                        "需要在 [build.gradle] android -> defaultConfig 节点下配置 WINK_VERSION \n android { \n     defaultConfig { \n         def buildTime = System.currentTimeMillis()\n" +
+                        "        defaultConfig.buildConfigField(\"String\", \"WINK_VERSION\", \"\\\"${buildTime}\\\"\") \n     } \n }" +
+                        "\n================== WINK_VERSION 配置结束 ====================");
+            } else {
+                Settings.data.newVersion = buildConfigFields.get("WINK_VERSION").getValue().replace("\"", "");
+            }
+
+            WinkLog.d("Embedded WINK_VERSION , newVersion:" + Settings.data.newVersion);
+        });
     }
 
     public void createWinkTask(Project project) {
