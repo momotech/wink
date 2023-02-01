@@ -124,6 +124,12 @@ https://s.momocdn.com/s1/u/geajgghjh/Wink-2.1.2.zip
 如果出现异常，可以尝试配置 `JAVA_HONE` 路径与 AndroidStudio `JDK location` 路径一致。
 ![WechatIMG2.png](http://tva1.sinaimg.cn/large/0020yNeuly1gv99jveyygj61au0pqqa702.jpg)
 
+### 打包到 Maven
+- 首先执行 `assemble` Task
+- 打开 `wink-patch-lib` 目录下的 `apply from: 'repo-maven-push.gradle'`
+- 打开 `wink` 目录下的 `settings.gradle` 的 `include ':wink-gradle-plugin'`
+- 更新 `repo-maven-push.gradle` 和 `:wink-gradle-plugin` 的 `build.gradle` 的 Version 
+- 注释 `buildSrc` 目录下的 `settings.gradle` 的代码，打开 `wink-gradle-plugin` 目录下 `build.gradle` 中 `afterEvaluate` 代码块
 
 ### 更新日志
 

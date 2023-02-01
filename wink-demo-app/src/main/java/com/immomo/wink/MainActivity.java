@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.immomo.wink.utils.YY;
 import com.immomo.wink.utils.ZZ;
 
 import org.greenrobot.eventbus.EventBus;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(new Test111().getAAA() + ":" + new ZZ().getKK());
+        textView.setText(new Test111().getAAA() + ":" + new ZZ().getKK() + " --- " + YY.getKK());
 
         textView.setOnClickListener((v)->{
             ARouter.getInstance().build("/com/Activity4").navigation();

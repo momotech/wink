@@ -17,5 +17,6 @@ include ':wink-compiler-hook-lib'
 include ':wink-patch-lib'
 include ':wink-demo-lib'
 include ':wink-demo-app'
+//include ':wink-gradle-plugin'
 
 gradle.ext.dev = true

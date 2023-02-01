@@ -1,0 +1,79 @@
+//远程仓库发布脚本
+//官方doc: https://docs.gradle.org/7.0/userguide/publishing_setup.html#publishing_overview
+//谷歌文档 https://developer.android.com/studio/build/maven-publish-plugin?hl=zh-cn#groovy
+//首先记得 生成 aar 包，在本module task 中执行 assemble 任务 会在 build/output/aar 生成对应的aar包
+//其次执行 publish 发布 aar 包
+apply plugin: 'maven-publish'
+
+
+def GroupId = 'com.immomo.wink'
+def ArtifactId = 'patch-lib'
+def Version = '0.3.10_gradle7'
+
+def getRepositoryUsername() {
+    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+
+def releasesRepoUrl = gradle.momoRepositoriesAndroid
+
+def userName = getRepositoryUsername()
+def passWord = getRepositoryPassword()
+
+task generateSourcesJar(type: Jar){
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
+
+afterEvaluate {
+    publishing {
+        //发布的 arr 包配置
+        publications{
+            //名字可以自己指定，如果有多渠道，整段多复制一个
+            release(MavenPublication){
+
+                groupId = GroupId//公司域名
+                artifactId = ArtifactId//该aar包的名称
+                version = Version//版本号
+
+                // 必须有这个 否则不会上传AAR包
+                afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
+                // 多渠道，可以自行指定aar路径
+                // def projectName = project.getName()
+                // artifact "build/outputs/aar/${projectName}-release.aar"
+                // 上传source，这样使用方可以看到方法注释
+                artifact generateSourcesJar
+                //依赖关系
+                pom.withXml{
+                    def dependenciesNode = asNode().appendNode("dependencies")
+                    configurations.implementation.allDependencies.forEach(){
+                        Dependency dependency ->
+                            if (dependency.version != "unspecified" && dependency.name != "unspecified"){
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', dependency.group)
+                                dependencyNode.appendNode('artifactId', dependency.name)
+                                dependencyNode.appendNode('version', dependency.version)
+                            }
+                    }
+                }
+            }
+        }
+
+        //仓库地址配置
+        repositories {
+            maven {
+                //允许使用 http
+                allowInsecureProtocol = true
+                url = releasesRepoUrl
+                credentials {
+                    username = userName
+                    password = passWord
+                }
+            }
+        }
+    }
+}

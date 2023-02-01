@@ -1,6 +1,25 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 apply plugin: 'maven-publish'
+//apply from: rootProject.file('wink-publish/UploadProperties.gradle')
+
+def GroupId = 'com.immomo.wink'
+def ArtifactId = 'plugin'
+def Version = '0.3.10_gradle7'
+
+def getRepositoryUsername() {
+    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+
+def releasesRepoUrl = "http://maven.wemomo.com:18081/nexus/content/repositories/android/"
+//def releasesRepoUrl = gradle.momoRepositoriesAndroid
+
+def userName = getRepositoryUsername()
+def passWord = getRepositoryPassword()
 
 buildscript {
     ext {
@@ -63,4 +82,30 @@ jar {
 }
 
 //apply from: '../wink-publish/upload_plugin.gradle'
+
+afterEvaluate { project ->
+    //发布的 jar 包配置
+    publishing {
+        publications {
+            plugin(MavenPublication) {
+                groupId = GroupId
+                artifactId = ArtifactId
+                version = Version
+                from components.java //使用默认的配置生成jar包
+            }
+        }
+        //仓库地址配置
+        repositories {
+            maven {
+                //允许使用 http
+                allowInsecureProtocol = true
+                url = releasesRepoUrl
+                credentials {
+                    username = userName
+                    password = passWord
+                }
+            }
+        }
+    }
+}
 

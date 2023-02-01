@@ -79,8 +79,11 @@ public class IncrementPatchHelper {
     private boolean isDiffVersion(String deviceId) {
         boolean diffVersion = true;
         String lsCmd = "adb -s " + deviceId + " shell ls " + PathUtils.getVersionPath(deviceId);
+        WinkLog.i("isDiffVersion : " + lsCmd);
         Utils.ShellResult versionResult = Utils.runShells(lsCmd);
+        WinkLog.i("isDiffVersion data 111: " + Settings.env.version);
         for (String s : versionResult.getResult()) {
+            WinkLog.i("isDiffVersion data: " + s);
             if (s.contains(Settings.env.version)) {
                 diffVersion = false;
                 break;
@@ -114,7 +117,10 @@ public class IncrementPatchHelper {
             Utils.runShells(Utils.ShellOutput.NONE, "source ~/.bash_profile", mkdirStr);
 
             String lsStr = "adb -s " + deviceId + " shell ls " + Settings.data.patchPath;
+
+            WinkLog.i("cmd : " + lsStr);
             result = Utils.runShells(lsStr);
+            WinkLog.i("cmd result : " + result);
             if (result.getErrorResult().size() > 0) {
                 WinkLog.throwAssert("Can not create patch file " + Settings.data.patchPath);
             }

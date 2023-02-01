@@ -51,7 +51,7 @@ buildscript {
         uiAutomatorVersion = '2.2.0'
         viewPagerVersion = '1.0.0'
         workVersion = '2.1.0'
-        kotlin_version = '1.5.21'
+        kotlin_version = '1.1.15'
     }
 
     repositories {
@@ -87,6 +87,18 @@ allprojects {
         google()
         jcenter()
     }
+    afterEvaluate { project ->
+        def android = project.extensions.findByName("android")
+        if(android != null){
+            def defaultConfig =  android["defaultConfig"]
+            def buildTime = System.currentTimeMillis()
+            defaultConfig.buildConfigField("String", "WINK_VERSION_111", "\"${buildTime}\"")
+//            def buildTime = new Date()
+//            defaultConfig.buildConfigField("String", "WINK_VERSION", "\"${buildTime.format('yyyy-MM-dd HH:mm:ss')}\"")
+        }
+    }
+
+
 }
 
 spotless {

@@ -4,6 +4,8 @@ plugins {
     id 'maven-publish'
 }
 
+//apply from: 'repo-maven-push.gradle'
+
 android {
     compileSdk 31
 
