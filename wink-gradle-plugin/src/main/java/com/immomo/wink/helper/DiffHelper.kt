@@ -78,8 +78,10 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     private var diffPropertiesPath: String
     private var csvPathCode: String
     private var csvPathRes: String
+    private var csvPathClass: String
     private val scanPathCode: String
     private var scanPathRes: String
+    private var scanPathClass: String
     private val extensionList = listOf("java", "kt", "xml", "json", "png", "jpeg", "webp")
 
     private var csvReader: CsvReader
@@ -94,9 +96,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
         scanPathCode = "${project.fixedInfo.dir}/src/main/java"
         scanPathRes = "${project.fixedInfo.dir}/src/main/res"
+        scanPathClass = project.fixedInfo.buildDir ?: ""
 
         csvPathCode = "${diffDir}/md5_code.csv"
         csvPathRes = "${diffDir}/md5_res.csv"
+        csvPathClass = "${diffDir}/md5_class.csv"
 
         diffPropertiesPath = "${diffDir}/ps_diff.properties"
 
@@ -170,9 +174,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     private fun initSnapshotByMd5() {
         File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
         File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+        File(csvPathClass).takeIf { it.exists() }?.let { it.delete() }
 
         genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+        genClassSnapshotAndSaveToDisk(scanPathClass, csvPathClass)
     }
 
 
@@ -399,6 +405,39 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             }
 
         WinkLog.d(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+    }
+
+    /**
+     * 把 .class 文件保存到 .csv，变动后替换变更的 .class 文件
+     */
+    private fun genClassSnapshotAndSaveToDisk(path: String, csvPath: String) {
+        val csvFile = File(csvPath)
+        if (!csvFile.exists()) {
+            csvFile.parentFile.mkdirs()
+            csvFile.createNewFile()
+        }
+
+        val timeBegin = System.currentTimeMillis()
+        File(path).walk()
+            .filter {
+                it.isFile
+            }
+            .filter {
+                // incrementalData: An output path for the binary stubs.
+                !it.absolutePath.contains("kapt3/incrementalData") // 排除 kapt stubs 产物
+            }
+            .filter {
+                it.extension == "class"
+            }
+            .forEach {
+//                val row = listOf(it.absolutePath, getSnapshot(it))
+                csvWriter.open(csvPath, append = true) {
+                    writeRow(it.absolutePath)
+                }
+            }
+
+        WinkLog.d(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+
     }
 
     private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {

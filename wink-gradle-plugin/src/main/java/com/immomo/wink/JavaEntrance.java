@@ -45,12 +45,23 @@ public class JavaEntrance {
 
         new ResourceHelper().checkResourceWithoutTask(); // 内部判断：Settings.data.hasResourceChanged
         new CompileHelper().compileCode();
+
+        getCompileClass();
+
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
         }
     }
 
+    private static void getCompileClass() {
+//        String tempClassPath = Settings.env.tmpPath + "/tmp_class";
+//        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+//        }
+//        new DiffHelper(projectInfo).diff(projectInfo); //
+    }
+
     private static void updateSnapShot() {
+        WinkLog.i("更新本地缓存的文件时间戳");
         for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
                 new DiffHelper(info).initSnapshotForCode();

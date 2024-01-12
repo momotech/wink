@@ -37,15 +37,17 @@ public class IncrementPatchHelper {
 
         WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.classChangedCount + "，是否新增改名：" + Settings.data.hasResourceChanged);
 
-        createPatchFile(devicesList);
-        patchDex(devicesList);
-        patchResources(devicesList);
+        boolean createPatchFileSuccess = createPatchFile(devicesList);
+        boolean patchDexSuccess = patchDex(devicesList);
+        boolean patchResourcesSuccess = patchResources(devicesList);
         restartApp(devicesList);
 
         WinkLog.i("Patch finish in " + (System.currentTimeMillis() - Settings.data.beginTime) / 1000 + "s.");
         WinkLog.i(Settings.data.classChangedCount + " file changed, "
                 + (Settings.data.hasResourceChanged ? "has" : "no") + " resource changed.");
-        return true;
+        boolean result = createPatchFileSuccess && patchDexSuccess && patchResourcesSuccess;
+        WinkLog.i("==========>>> patchToApp result : " + result);
+        return result;
     }
 
     // 检测手机中 Version 是否与本地相同，不同则 push 缓存 apk 和 Version 文件
@@ -89,7 +91,7 @@ public class IncrementPatchHelper {
         return diffVersion;
     }
 
-    public void createPatchFile(@NotNull List<String> devicesList) {
+    public boolean createPatchFile(@NotNull List<String> devicesList) {
         for (int i = 0; i < devicesList.size(); i++) {
             String deviceId = devicesList.get(i);
             String patch = "/sdcard/Android/data/" + Settings.env.debugPackageName;
@@ -116,41 +118,52 @@ public class IncrementPatchHelper {
             String lsStr = "adb -s " + deviceId + " shell ls " + Settings.data.patchPath;
             result = Utils.runShells(lsStr);
             if (result.getErrorResult().size() > 0) {
-                WinkLog.throwAssert("Can not create patch file " + Settings.data.patchPath);
+                WinkLog.i("==========>>> createPatchFile Failure : " + result.getErrorResult().toString());
+                return false;
             }
         }
+        return true;
     }
 
-    public void patchDex(@NotNull List<String> devicesList) {
+    public boolean patchDex(@NotNull List<String> devicesList) {
         if (Settings.data.classChangedCount <= 0) {
-            return;
+            return false;
         }
 
         WinkLog.i("Dex patching...");
 
         for (int i = 0; i < devicesList.size(); i++) {
             String patchName = Settings.env.version + "_patch.jar";
-            Utils.runShells("source ~/.bash_profile\n" + "adb -s " + devicesList.get(i) + " push " + Settings.env.tmpPath + "/" + patchName
+            Utils.ShellResult shellResult = Utils.runShells("source ~/.bash_profile\n" + "adb -s " + devicesList.get(i) + " push " + Settings.env.tmpPath + "/" + patchName
                     + " " + Settings.data.patchPath + Settings.env.version + "_patch.png");
+            if (shellResult.getErrorResult().size() > 0) {
+                WinkLog.i("=============== patchDex Failure : " + shellResult.getErrorResult().toString());
+                return false;
+            }
         }
-
+        return true;
     }
 
-    public void patchResources(@NotNull List<String> devicesList) {
+    public boolean patchResources(@NotNull List<String> devicesList) {
         if (!Settings.data.hasResourceChanged) {
-            return;
+            return true;
         }
 
         WinkLog.i("Resources patching...");
 
         for (String deviceId : devicesList) {
             String patchName = Settings.env.version + ResourceHelper.apk_suffix;
-            Utils.runShells("source ~/.bash_profile\n" +
+            Utils.ShellResult shellResult = Utils.runShells("source ~/.bash_profile\n" +
                     "adb -s " + deviceId + " shell rm -rf " + Settings.data.patchPath + "apk\n" +
                     "adb -s " + deviceId + " shell mkdir " + Settings.data.patchPath + "apk\n" +
                     "adb -s " + deviceId + " push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath + "apk/" +
                     Settings.env.version + RESOURCE_APK_SUFFIX);
+            if (shellResult.getErrorResult().size() > 0) {
+                WinkLog.i("==============>>>>>>> patchResources Failure : " + shellResult.getErrorResult().toString());
+                return false;
+            }
         }
+        return true;
     }
 
     public void restartApp(@NotNull List<String> devicesList) {
