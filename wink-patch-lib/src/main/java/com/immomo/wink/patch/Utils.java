@@ -51,17 +51,22 @@ public class Utils {
 
 
     public static boolean deleteFile(File dirFile) {
-        if (!dirFile.exists()) {
-            return false;
-        }
-        if (dirFile.isFile()) {
-            return dirFile.delete();
-        } else {
-            for (File file : dirFile.listFiles()) {
-                deleteFile(file);
+        try {
+            if (!dirFile.exists()) {
+                return false;
             }
+            if (dirFile.isFile()) {
+                return dirFile.delete();
+            } else {
+                for (File file : dirFile.listFiles()) {
+                    deleteFile(file);
+                }
+            }
+            return dirFile.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return dirFile.delete();
+        return true;
     }
 
     public static boolean copyFile(File src, String destPath) {
