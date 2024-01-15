@@ -32,6 +32,8 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import java.io.File
 import java.io.FileReader
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.*
 
 const val KEY_COMMIT_ID = "key_commit_id"
@@ -406,6 +408,34 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
         WinkLog.d(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
+
+
+    fun copyClassFile(classList: Map<String, String>): List<String> {
+        val resultList = arrayListOf<String>()
+        csvReader.open(csvPathClass) {
+            readAllAsSequence().forEach {
+                if (it.isEmpty()) return@forEach
+                val fullPath = it[0]
+                classList.forEach { it ->
+                    if (fullPath.contains(it.key)) {
+                        WinkLog.d("「替换 class 文件」" + it.value + " ======>> " + fullPath + " ")
+                        try {
+                            Files.copy(
+                                File(it.value).toPath(),
+                                File(fullPath).toPath(),
+                                *arrayOf(StandardCopyOption.REPLACE_EXISTING)
+                            )
+                        } catch (e: Exception) {
+                            WinkLog.d("[Error] $e")
+                        }
+                        resultList.add(fullPath)
+                    }
+                }
+            }
+        }
+        return resultList
+    }
+
 
     /**
      * 把 .class 文件保存到 .csv，变动后替换变更的 .class 文件

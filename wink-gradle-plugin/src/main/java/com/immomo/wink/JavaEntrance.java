@@ -1,11 +1,17 @@
 package com.immomo.wink;
 
-import com.immomo.wink.helper.ResourceHelper;
 import com.immomo.wink.helper.CompileHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
+import com.immomo.wink.helper.ResourceHelper;
+import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JavaEntrance {
     public static void main(String[] args) {
@@ -46,18 +52,45 @@ public class JavaEntrance {
         new ResourceHelper().checkResourceWithoutTask(); // 内部判断：Settings.data.hasResourceChanged
         new CompileHelper().compileCode();
 
-        getCompileClass();
-
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
+            new CopyClassFileThread().start();
+        } else {
+            if (Settings.data.classChangedCount <= 0 && !Settings.data.hasResourceChanged) {
+                WinkLog.i("没有文件变更");
+            } else {
+                WinkLog.i("增量编译失败！！！");
+            }
+        }
+    }
+
+    static class CopyClassFileThread extends Thread {
+        @Override
+        public void run() {
+            getCompileClass();
         }
     }
 
     private static void getCompileClass() {
-//        String tempClassPath = Settings.env.tmpPath + "/tmp_class";
-//        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
-//        }
-//        new DiffHelper(projectInfo).diff(projectInfo); //
+        String tempClassFolder = "tmp_class";
+        String command = "find " + Settings.env.tmpPath + "/" + tempClassFolder + " -name \"*.class\"";
+        Utils.ShellResult shellResult = Utils.runShells(command);
+        List<String> result = shellResult.getResult();
+        Map<String, String> purePathMap = new HashMap<>();
+        for (String s : result) {
+            String[] split = s.split(tempClassFolder);
+            if (split.length > 1) {
+                purePathMap.put(split[1], s);
+            }
+        }
+        WinkLog.i("result : " + result);
+//        WinkLog.i("purePathList : " + purePathMap);
+
+        List<String> resultPathList = new ArrayList<>();
+        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+            List<String> strings = new DiffHelper(projectInfo).copyClassFile(purePathMap);
+            resultPathList.addAll(strings);
+        }
     }
 
     private static void updateSnapShot() {

@@ -47,7 +47,7 @@ public class IncrementPatchHelper {
                 + (Settings.data.hasResourceChanged ? "has" : "no") + " resource changed.");
         boolean result = createPatchFileSuccess && patchDexSuccess && patchResourcesSuccess;
         WinkLog.i("==========>>> patchToApp result : " + result);
-        return result;
+        return true;
     }
 
     // 检测手机中 Version 是否与本地相同，不同则 push 缓存 apk 和 Version 文件

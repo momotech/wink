@@ -111,6 +111,16 @@ public class WinkPlugin implements Plugin<Project> {
 
     public void createWinkTask(Project project) {
         project.getTasks().register("wink", task -> {
+            Object openLogValue = project.getProperties().get("OpenLog");
+            boolean openLog = false;
+            if (openLogValue instanceof String) {
+                openLog = Boolean.parseBoolean((String) openLogValue);
+            }
+            WinkLog.d("\n\n");
+            WinkLog.d("========================================");
+            WinkLog.d("            openLog : " + openLog);
+            WinkLog.d("========================================\n\n");
+
             task.doLast(task1 -> JavaEntrance.main(new String[]{"."}));
         }).get().setGroup(Settings.NAME);
     }
